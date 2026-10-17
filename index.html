@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velorn — Brand &amp; Digital Design Studio</title>
+  <meta name="description" content="Independent minds creating distinctive brands, expressive websites and thoughtful digital experiences. Discover Velorn and bring your next idea to life." />
+  <link rel="icon" type="image/png" href="/images/pYj3rmMAFIiElLWFTEDjLVap2Y.png" />
+  <link rel="apple-touch-icon" href="/images/wsiFMP6AyhD9kT30CeTkT4O6nNk.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Velorn — Brand &amp; Digital Design Studio" />
+  <meta property="og:description" content="Independent minds creating distinctive brands, expressive websites and thoughtful digital experiences." />
+  <meta property="og:image" content="/images/ws4amg82ncHwc5izuYrR6m7k3c.png" />
+
+  <link rel="stylesheet" href="/src/styles/index.css" />
+</head>
+<body>
+
+  <!-- Preloader Screen -->
+  <div id="preloader">
+    <div class="loader-brand">
+      <span>Velorn</span>
+      <span class="loader-reg">R</span>
+    </div>
+  </div>
+
+  <!-- Interactive Custom Cursor -->
+  <div class="custom-cursor">
+    <div class="custom-cursor-dot"></div>
+    <div class="custom-cursor-badge"></div>
+  </div>
+
+  <!-- Background 3D Raymarched Metal Sculpture Canvas -->
+  <div class="sculpture-container" id="sculpture-container" aria-hidden="true">
+    <canvas id="sculpture-canvas" class="sculpture-canvas"></canvas>
+  </div>
+
+  <!-- Top Sticky Navigation -->
+  <header class="site-header">
+    <a href="#" class="brand-link" data-cursor="HOME">
+      <svg class="brand-logo-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="10" height="24" rx="5" transform="rotate(-30 2 2)" fill="#ffffff" />
+        <rect x="16" y="8" width="10" height="24" rx="5" transform="rotate(-30 16 8)" fill="#fc201f" />
+      </svg>
+      <span>Velorn</span>
+      <span class="brand-reg">R</span>
+    </a>
+
+    <div class="header-actions">
+      <button class="menu-pill-btn" id="menu-toggle" aria-label="Open Navigation Menu" data-cursor="MENU">
+        <span class="menu-pill-icon">
+          <span></span>
+          <span></span>
+        </span>
+        <span>MENU</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Full-screen Overlay Menu Drawer -->
+  <div class="menu-overlay" id="menu-overlay" role="dialog" aria-modal="true">
+    <div class="menu-header">
+      <div class="mono" style="color: var(--text-muted);">Velorn / Independent creative studio</div>
+      <button class="menu-close-btn" id="menu-close" data-cursor="CLOSE">CLOSE [ESC]</button>
+    </div>
+
+    <ul class="menu-nav-list">
+      <li>
+        <a href="#intro" class="menu-nav-link" data-cursor="GO">
+          <span class="num">01</span>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="#work" class="menu-nav-link" data-cursor="GO">
+          <span class="num">02</span>
+          <span>Works (10)</span>
+        </a>
+      </li>
+      <li>
+        <a href="#approach" class="menu-nav-link" data-cursor="GO">
+          <span class="num">03</span>
+          <span>Approach</span>
+        </a>
+      </li>
+      <li>
+        <a href="#services" class="menu-nav-link" data-cursor="GO">
+          <span class="num">04</span>
+          <span>Services</span>
+        </a>
+      </li>
+      <li>
+        <a href="#contact" class="menu-nav-link" data-cursor="GO">
+          <span class="num">05</span>
+          <span>Contact</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="menu-footer">
+      <div class="mono">Independent minds. Shared ambition.</div>
+      <div class="menu-social-links">
+        <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://pinterest.com" target="_blank" rel="noopener">Pinterest</a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- SECTION 00 / INTRO (HERO) -->
+    <section class="hero-section" id="intro">
+      <div class="hero-content">
+        <div class="tag-label mono">
+          <span>00 / INTRO</span>
+          <span class="jp-accent">創造</span>
+        </div>
+        <h1 class="hero-title">
+          Ideas made<br />
+          unforgettable<span class="dot">.</span>
+        </h1>
+        <p class="hero-lead">
+          Brands, websites and digital products with a clear point of view.
+        </p>
+
+        <!-- Exact Velorn Action Links with Arrow -->
+        <div class="hero-link-actions">
+          <a href="#contact" class="velorn-link" data-cursor="CONTACT">
+            <span>START A PROJECT</span>
+            <span class="arrow-sym">↗</span>
+          </a>
+          <a href="#work" class="velorn-link" data-cursor="EXPLORE">
+            <span>EXPLORE OUR WORK</span>
+            <span class="arrow-sym">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-bottom-bar">
+        <div class="scroll-prompt mono">
+          <span class="arrow-down">↓</span>
+          <span>SCROLL TO DISCOVER</span>
+        </div>
+        <div class="studio-badge-wrapper">
+          <svg class="globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            <path d="M2 12h20"/>
+          </svg>
+          <div class="mono studio-badge-copy">
+            <span>INDEPENDENT IN SPIRIT.</span>
+            <span>CONNECTED BY DESIGN.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 01 / THE STUDIO -->
+    <section class="studio-section section-wrapper" id="studio">
+      <div class="tag-label mono">
+        <span>01 / THE STUDIO</span>
+        <span class="jp-accent">私たち</span>
+      </div>
+      <div class="studio-grid">
+        <h2 class="statement-heading">
+          We build brands and websites that turn a clear idea into a distinctive experience.
+        </h2>
+        <div class="statement-sub">
+          <p>
+            From positioning and visual identity to interface design and Framer development, we connect every part of your digital presence.
+          </p>
+          <a href="#approach" class="velorn-link" style="margin-top: 28px;" data-cursor="VIEW">
+            <span>OUR APPROACH</span>
+            <span class="arrow-sym">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02 / VISION -->
+    <section class="vision-section" id="vision">
+      <div class="marquee-container" aria-hidden="true">
+        <div class="marquee-track">
+          <div class="marquee-item">
+            <span>SHAPE 造形</span>
+            <span class="marquee-plus">+</span>
+            <span>EVOLVE 進化</span>
+            <span class="marquee-plus">+</span>
+            <span>IMAGINE 想像</span>
+            <span class="marquee-plus">+</span>
+            <span>SHAPE 造形</span>
+            <span class="marquee-plus">+</span>
+            <span>EVOLVE 進化</span>
+            <span class="marquee-plus">+</span>
+            <span>IMAGINE 想像</span>
+            <span class="marquee-plus">+</span>
+          </div>
+          <div class="marquee-item">
+            <span>SHAPE 造形</span>
+            <span class="marquee-plus">+</span>
+            <span>EVOLVE 進化</span>
+            <span class="marquee-plus">+</span>
+            <span>IMAGINE 想像</span>
+            <span class="marquee-plus">+</span>
+            <span>SHAPE 造形</span>
+            <span class="marquee-plus">+</span>
+            <span>EVOLVE 進化</span>
+            <span class="marquee-plus">+</span>
+            <span>IMAGINE 想像</span>
+            <span class="marquee-plus">+</span>
+          </div>
+        </div>
+      </div>
+      <p class="vision-tagline mono">✦ A THOUGHT BECOMES A WORLD.</p>
+    </section>
+
+    <!-- SECTION 03 / OUR APPROACH BENTO GRID -->
+    <section class="approach-section section-wrapper" id="approach">
+      <div class="tag-label mono">
+        <span>03 / OUR APPROACH</span>
+        <span class="jp-accent">姿勢</span>
+      </div>
+
+      <div class="section-title-row">
+        <h2 class="section-main-heading">A closer look.</h2>
+        <p class="section-desc">A clear process. From first conversation to launch.</p>
+      </div>
+
+      <!-- Exact 6-Card Bento Grid Matching Velorn Screenshot 2 -->
+      <div class="velorn-bento-grid">
+        
+        <!-- Card 1: Crimson Red Card (Top Left, 2 Cols) -->
+        <article class="bento-box bento-red" data-cursor="PROCESS">
+          <div class="bento-top-tag mono">DISCOVER / DESIGN / BUILD</div>
+          <div class="bento-huge-num">03</div>
+          <p class="bento-body-text">
+            First we define the brief. Then we design the direction and build it for the web.
+          </p>
+        </article>
+
+        <!-- Card 2: Tall Art Direction Card (Right, Spans 2 Rows) -->
+        <article class="bento-box bento-portrait" data-cursor="ART">
+          <div class="bento-top-tag mono">ART DIRECTION / CONCEPT STUDY</div>
+          <div class="bento-portrait-img-wrap">
+            <img src="/images/pNDjAyywepS1TLOWplJQ6DmZ30.png" alt="Editorial design study" loading="lazy" />
+          </div>
+          <h3 class="bento-portrait-title">
+            Designed around people.<span class="dot-red">•</span>
+          </h3>
+        </article>
+
+        <!-- Card 3: One Shared Brief (Middle Left, 1 Col) -->
+        <article class="bento-box bento-standard" data-cursor="BRIEF">
+          <div class="bento-top-tag mono">ONE SHARED BRIEF</div>
+          <div class="bento-huge-num">01</div>
+          <p class="bento-standard-text">
+            A clear scope, priorities and checkpoints before production begins.
+          </p>
+        </article>
+
+        <!-- Card 4: Ready For Launch (Middle Center, 1 Col) -->
+        <article class="bento-box bento-standard" data-cursor="LAUNCH">
+          <div class="bento-top-tag mono">READY FOR LAUNCH</div>
+          <div class="bento-huge-num">GO</div>
+          <p class="bento-standard-text">
+            Responsive layouts, interaction checks and a handover you can use.
+          </p>
+        </article>
+
+        <!-- Card 5: Material Exploration (Bottom Left, 1 Col) -->
+        <article class="bento-box bento-media-card" data-cursor="TEXTURE">
+          <div class="bento-top-tag mono">Velorn / MATERIAL EXPLORATION</div>
+          <div class="bento-media-img-wrap">
+            <img src="/images/lSvkRh08IW3ry15pTbdpy3Ja8WQ.png" alt="Material exploration" loading="lazy" />
+          </div>
+          <h3 class="bento-media-title">Precision. With personality.</h3>
+        </article>
+
+        <!-- Card 6: Digital Experiences / Made Human (Bottom Center & Right, 2 Cols) -->
+        <article class="bento-box bento-media-card bento-wide" data-cursor="PRODUCT">
+          <div class="bento-top-tag mono">DIGITAL EXPERIENCES / MADE HUMAN</div>
+          <div class="bento-media-img-wrap bento-watch-wrap">
+            <img src="/images/UxDodElMcEIQykAkocF933Ylps.png" alt="Smartwatch interface study" loading="lazy" />
+          </div>
+          <h3 class="bento-media-title">Small screen. Clear decisions.</h3>
+        </article>
+
+      </div>
+
+      <div class="approach-bottom-banner mono">
+        INDEPENDENT THINKING / COLLECTIVE CRAFT / LASTING VALUE
+      </div>
+    </section>
+
+    <!-- SECTION 04 / SELECTED WORKS (EXACT VELORN PINNED SLIDER) -->
+    <section class="works-pinned-section" id="work">
+      <!-- Pinned Left Header Column -->
+      <div class="works-pinned-sidebar">
+        <div class="tag-row">
+          <span class="red-beacon"></span>
+          <div class="tag-label mono" style="margin-bottom: 0;">
+            <span>04 / SELECTED WORKS</span>
+            <span class="jp-accent">制作</span>
+          </div>
+        </div>
+
+        <h2 class="works-sidebar-title">
+          Ideas out<br />
+          in the world.
+        </h2>
+      </div>
+
+      <!-- Toggle Button above card -->
+      <button class="card-cross-btn" aria-label="Toggle details">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Horizontally Scrolling Project Cards Track -->
+      <div class="works-slider-track">
+
+        <!-- Card 1: Aether -->
+        <article class="project-slide-card" data-cursor="VIEW">
+          <div class="slide-media-wrap">
+            <img src="/images/ws4amg82ncHwc5izuYrR6m7k3c.png" alt="Aether AI interface design" loading="lazy" />
+          </div>
+          <div class="slide-info">
+            <div class="slide-tag mono">01 / DIGITAL PRODUCT</div>
+            <h3 class="slide-title">Aether</h3>
+            <p class="slide-desc">
+              Making AI tools easier to navigate. Product positioning, interface direction and a focused landing-page concept.
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 2: Noct -->
+        <article class="project-slide-card" data-cursor="VIEW">
+          <div class="slide-media-wrap">
+            <img src="/images/Y8CuMjp97ZIPwsYO7FCiwfWCuw.png" alt="Noct independent fashion" loading="lazy" />
+          </div>
+          <div class="slide-info">
+            <div class="slide-tag mono">02 / CULTURE &amp; FASHION</div>
+            <h3 class="slide-title">Noct</h3>
+            <p class="slide-desc">
+              Giving independent fashion an editorial voice. Art direction, typography and a responsive website concept.
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 3: Sora Living -->
+        <article class="project-slide-card" data-cursor="VIEW">
+          <div class="slide-media-wrap">
+            <img src="/images/2qCpz8LhSsfuwNGPFUJWJDsT8A.png" alt="Sora Living architecture showcase" loading="lazy" />
+          </div>
+          <div class="slide-info">
+            <div class="slide-tag mono">03 / ARCHITECTURE</div>
+            <h3 class="slide-title">Sora Living</h3>
+            <p class="slide-desc">
+              Helping architecture speak through space and imagery. Visual direction and a project-led website concept.
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 4: Forma -->
+        <article class="project-slide-card" data-cursor="VIEW">
+          <div class="slide-media-wrap">
+            <img src="/images/7hQXtXjg3yy0QIhemR4kqWrrym8.png" alt="Forma brand system" loading="lazy" />
+          </div>
+          <div class="slide-info">
+            <div class="slide-tag mono">04 / BRAND &amp; WEB</div>
+            <h3 class="slide-title">Forma</h3>
+            <p class="slide-desc">
+              Turning a distinct point of view into a brand system. Identity exploration, art direction and website design.
+            </p>
+          </div>
+        </article>
+
+        <!-- End Slide: Your next big move -->
+        <article class="project-slide-card works-end-slide" data-cursor="VIEW">
+          <div class="works-end-inner">
+            <div class="works-end-icon" aria-hidden="true">
+              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
+                <rect x="2" y="2" width="10" height="24" rx="5" transform="rotate(-30 2 2)" fill="#fc201f" />
+                <rect x="16" y="8" width="10" height="24" rx="5" transform="rotate(-30 16 8)" fill="#fc201f" />
+              </svg>
+            </div>
+            <div class="mono works-end-tag">NEXT / YOUR AMBITION</div>
+            <h3 class="works-end-heading">Your next big<br/>move.</h3>
+            <p class="works-end-sub">A new brand. A better experience. A bold next chapter.<br/>Let's build it together.</p>
+            <a href="#contact" class="velorn-link works-end-link" data-cursor="CONTACT">
+              <span>ALL WORKS</span>
+              <span class="arrow-sym">↗</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Bottom Span Progress Track -->
+      <div class="works-bottom-bar">
+        <div class="works-counter mono">
+          <span class="curr-idx">01</span> / <span class="total-idx">04</span>
+        </div>
+        <div class="works-progress-line-track">
+          <div class="works-progress-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 05 / SERVICES -->
+    <section class="services-section section-wrapper" id="services">
+      <div class="tag-label mono">
+        <span>05 / SERVICES</span>
+        <span class="jp-accent">領域</span>
+      </div>
+
+      <div class="section-title-row">
+        <h2 class="section-main-heading">One connected process.</h2>
+        <p class="section-desc">A clear deliverable at every stage. No silos, no handoff friction.</p>
+      </div>
+
+      <div class="services-list">
+        <!-- Service 01 -->
+        <div class="service-item open" data-cursor="TOGGLE">
+          <div class="service-summary">
+            <div class="service-left">
+              <span class="service-num">(01)</span>
+              <h3 class="service-name">Strategy</h3>
+            </div>
+            <span class="service-plus">+</span>
+          </div>
+          <div class="service-details">
+            <p class="service-desc">
+              Defining the core foundation before design begins. We clarify your market positioning, define audience personas, and create structured digital roadmaps.
+            </p>
+            <ul class="service-deliverables">
+              <li>Brand Positioning &amp; Value Proposition</li>
+              <li>Competitive Benchmarking &amp; Research</li>
+              <li>Information Architecture &amp; User Flow</li>
+              <li>Content Strategy &amp; Editorial Tone</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Service 02 -->
+        <div class="service-item" data-cursor="TOGGLE">
+          <div class="service-summary">
+            <div class="service-left">
+              <span class="service-num">(02)</span>
+              <h3 class="service-name">Identity</h3>
+            </div>
+            <span class="service-plus">+</span>
+          </div>
+          <div class="service-details">
+            <p class="service-desc">
+              Translating strategy into expressive visual systems. Distinct typography, cohesive palettes, bespoke 3D assets, and living design tokens.
+            </p>
+            <ul class="service-deliverables">
+              <li>Visual Identity Systems &amp; Guidelines</li>
+              <li>Typography Pairing &amp; Custom Lettering</li>
+              <li>Art Direction &amp; Asset Production</li>
+              <li>3D Elements &amp; Brand Motion Language</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Service 03 -->
+        <div class="service-item" data-cursor="TOGGLE">
+          <div class="service-summary">
+            <div class="service-left">
+              <span class="service-num">(03)</span>
+              <h3 class="service-name">Digital design</h3>
+            </div>
+            <span class="service-plus">+</span>
+          </div>
+          <div class="service-details">
+            <p class="service-desc">
+              Creating intuitive interfaces that elevate digital products. High-fidelity layouts, micro-interactions, responsive grids, and design system component libraries.
+            </p>
+            <ul class="service-deliverables">
+              <li>UI/UX Design for Web &amp; Mobile</li>
+              <li>Interactive Figma &amp; Framer Prototypes</li>
+              <li>Component Libraries &amp; Design Tokens</li>
+              <li>Conversion &amp; Landing Page Architecture</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Service 04 -->
+        <div class="service-item" data-cursor="TOGGLE">
+          <div class="service-summary">
+            <div class="service-left">
+              <span class="service-num">(04)</span>
+              <h3 class="service-name">Development</h3>
+            </div>
+            <span class="service-plus">+</span>
+          </div>
+          <div class="service-details">
+            <p class="service-desc">
+              Engineering with production-grade performance and fluid motion. Custom WebGL shaders, Framer components, GSAP timeline choreography, and SEO optimization.
+            </p>
+            <ul class="service-deliverables">
+              <li>Framer &amp; WebGL Creative Engineering</li>
+              <li>Fluid 60FPS Micro-interactions</li>
+              <li>Clean Semantic HTML &amp; Core Web Vitals</li>
+              <li>CMS Architecture &amp; Client Handover</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 06 / CLIENT PERSPECTIVES -->
+    <section class="clients-section section-wrapper" id="testimonials">
+      <div class="tag-label mono">
+        <span>06 / CLIENT PERSPECTIVES</span>
+        <span class="jp-accent">声</span>
+      </div>
+
+      <div class="section-title-row">
+        <h2 class="section-main-heading">Better, together.</h2>
+        <p class="section-desc">Collaborative partnerships with ambitious founders and design leads.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <!-- Review 1 -->
+        <article class="testimonial-card">
+          <p class="testimonial-quote">
+            "Velorn helped us articulate what made Aether different. The interface design felt considered, unmistakably premium, and our launch metrics exceeded every forecast."
+          </p>
+          <div class="testimonial-author-row">
+            <img src="/images/z8nEER7qBAhTZLrDV810NQRwU.png" alt="Mila Arden" class="author-avatar" loading="lazy" />
+            <div>
+              <div class="author-name">Mila Arden</div>
+              <div class="author-meta">Founder, Aether AI</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Review 2 -->
+        <article class="testimonial-card">
+          <p class="testimonial-quote">
+            "From the first conversation, they brought clarity to our visual identity. The digital experience gave Noct the exact editorial presence we envisioned."
+          </p>
+          <div class="testimonial-author-row">
+            <img src="/images/KWUa5ad8Sj8Gzp67jrjyb3jwDD4.png" alt="Leo Mercer" class="author-avatar" loading="lazy" />
+            <div>
+              <div class="author-name">Leo Mercer</div>
+              <div class="author-meta">Creative Director, Noct</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Review 3 -->
+        <article class="testimonial-card">
+          <p class="testimonial-quote">
+            "They treated our architectural portfolio with the same spatial care we give to buildings. Responsive, collaborative, and impeccably executed."
+          </p>
+          <div class="testimonial-author-row">
+            <img src="/images/wzlxx248lX7l1gFsWeou7XiS0GQ.png" alt="Nora Chen" class="author-avatar" loading="lazy" />
+            <div>
+              <div class="author-name">Nora Chen</div>
+              <div class="author-meta">Principal, Sora Living</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 07 / ALWAYS IN MOTION (3D CASE RING) -->
+    <section class="ring-section" id="motion">
+      <!-- Background Typography Layer: motion is behind 3D cards -->
+      <div class="ring-backdrop-layer">
+        <div class="tag-row ring-top-tag">
+          <span class="red-beacon"></span>
+          <div class="tag-label mono" style="margin-bottom: 0;">
+            <span>07 / ALWAYS IN MOTION</span>
+            <span class="jp-accent">探求</span>
+          </div>
+        </div>
+        <h2 class="ring-main-heading">
+          <span class="ring-heading-line1">Always in</span>
+          <span class="ring-heading-line2">motion.</span>
+        </h2>
+      </div>
+
+      <!-- 3D Interactive Case Ring WebGL Canvas Layer -->
+      <div class="ring-canvas-fullscreen" id="ring-container" data-cursor="DRAG 3D">
+        <canvas id="ring-canvas" class="ring-canvas"></canvas>
+      </div>
+
+      <!-- Foreground Interactive Overlay Layer (z-index: 5, pointer-events: none) -->
+      <div class="ring-foreground-layer">
+        <!-- Top row: description text floated to right -->
+        <div class="ring-top-row">
+          <p class="ring-lead-text">
+            Studies in material, typography and digital
+            interaction. A space to test ideas before they become
+            products.
+          </p>
+        </div>
+        <!-- Bottom row: explore link on right -->
+        <div class="ring-bottom-row">
+          <a href="#work" class="velorn-link" data-cursor="EXPLORE">
+            <span>EXPLORE THE WORK</span>
+            <span class="arrow-sym">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 08 / NEXT CHAPTER (CONTACT) -->
+    <section class="contact-section section-wrapper" id="contact">
+      <div class="tag-label mono">
+        <span>08 / NEXT CHAPTER</span>
+        <span class="jp-accent">終結</span>
+      </div>
+
+      <div class="contact-layout">
+        <div>
+          <h2 class="contact-huge-title">
+            Your idea.<br />
+            Our next obsession.
+          </h2>
+          <p style="color: var(--text-muted); font-size: 1.15rem; line-height: 1.6; max-width: 480px;">
+            Whether you are launching a new product, elevating an existing brand, or building a bespoke digital flagship, we'd love to hear your ambition.
+          </p>
+
+          <div class="contact-details">
+            <div class="mono" style="color: var(--text-muted);">DIRECT INQUIRY</div>
+            <a href="mailto:hello@velorn.studio" class="contact-email-link" data-cursor="EMAIL">
+              hello@velorn.studio
+            </a>
+            <div class="mono" style="color: var(--text-sub); margin-top: 12px;">
+              LOCATION: GLOBAL / REMOTE · TIMEZONE: UTC / EST
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Contact Form -->
+        <form class="contact-form" id="contact-form" onsubmit="event.preventDefault(); alert('Thank you for reaching out to Velorn. We will respond within 24 hours.');">
+          <div class="form-group">
+            <label class="form-label" for="client-name">YOUR NAME *</label>
+            <input type="text" id="client-name" class="form-input" placeholder="e.g. Eleanor Vance" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="client-email">EMAIL ADDRESS *</label>
+            <input type="email" id="client-email" class="form-input" placeholder="e.g. eleanor@company.com" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="project-scope">PROJECT SCOPE</label>
+            <input type="text" id="project-scope" class="form-input" placeholder="Brand Identity / Framer Website / Digital Product" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="project-notes">ABOUT THE PROJECT</label>
+            <textarea id="project-notes" class="form-textarea" placeholder="Tell us about your timeline, goals, and ambition..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;" data-cursor="SEND">
+            SEND INQUIRY ↗
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="mono" style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">
+        Velorn ®
+      </div>
+      <div class="footer-links">
+        <a href="#intro">HOME</a>
+        <a href="#work">WORKS</a>
+        <a href="#approach">APPROACH</a>
+        <a href="#services">SERVICES</a>
+        <a href="#contact">CONTACT</a>
+        <a href="#">PRIVACY POLICY</a>
+        <a href="#">TERMS OF USE</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>INDEPENDENT MINDS. SHARED AMBITION.</div>
+      <div>&copy; VELORN 2026. ALL RIGHTS RESERVED.</div>
+      <div>CREATED WITH PASSION &amp; REPLICATED IN SCYNE</div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
