@@ -1,4 +1,4 @@
-// Velorn Custom Interactive Cursor with Magnetic Snap and Mode Badges
+// Scyne Custom Interactive Cursor with Magnetic Snap and Mode Badges
 
 export class CustomCursor {
   constructor() {

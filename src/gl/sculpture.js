@@ -1,5 +1,5 @@
 // High-performance WebGL Raymarched 3D Metallic Sculpture
-// Direct mathematical reproduction of the Velorn 3D raymarching engine
+// Direct mathematical reproduction of the Scyne 3D raymarching engine
 
 export class SculptureScene {
   constructor(canvas, options = {}) {
@@ -7,13 +7,13 @@ export class SculptureScene {
     this.svgUrl = options.svgUrl || "/images/YwaEu83bwCHpgz1o29HBxX43MNc.svg";
     this.metal = options.metal || "#10131a";
     this.light = options.light || "#c8d2e2";
-    this.accent = options.accent || "#fc201f"; // Velorn vibrant red accent
+    this.accent = options.accent || "#fc201f"; // Scyne vibrant red accent
     this.specular = options.specular || "#fefefe";
     this.bg = options.bg || "#070707";
     this.shine = options.shine ?? 1.5;
     this.depth = options.depth ?? 0.12;
     this.bevel = options.bevel ?? 0.012;
-    this.size = options.size ?? 1.02; // Scaled up to match Velorn's massive hero sculpture
+    this.size = options.size ?? 1.02; // Scaled up to match Scyne's hero sculpture
     this.speed = options.speed ?? 0.9;
     this.horizontalPosition = options.horizontalPosition ?? (window.innerWidth > 900 ? 73 : 50); // percentage
     this.dragEnabled = options.dragEnabled ?? true;

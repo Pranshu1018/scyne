@@ -1,4 +1,4 @@
-// Velorn Full-screen Menu Controller
+// Scyne Full-screen Menu Controller
 
 export function initMenu(lenis) {
   const menuBtn = document.querySelector("#menu-toggle");

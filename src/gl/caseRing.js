@@ -1,5 +1,5 @@
 // WebGL 3D Cylindrical Case Study Ring
-// Pixel-perfect replica of Velorn Section 07 3D Case Ring
+// Interactive Scyne Section 07 3D Case Ring
 
 export class CaseRingScene {
   constructor(canvas, options = {}) {
