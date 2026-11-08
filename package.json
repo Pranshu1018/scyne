@@ -1,7 +1,7 @@
 {
-  "name": "scyne",
+  "name": "scyne-studio",
   "private": true,
-  "version": "1.0.0",
+  "version": "4.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,11 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "gsap": "^3.12.5",
+    "gsap": "^3.13.0",
     "lenis": "^1.1.18",
     "three": "^0.170.0"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.5.1",
     "vite": "^6.0.0"
   }
 }

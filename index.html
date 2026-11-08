@@ -1,701 +1,285 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scyne — Brand &amp; Digital Design Studio</title>
-  <meta name="description" content="Independent minds creating distinctive brands, expressive websites and thoughtful digital experiences. Discover Scyne and bring your next idea to life." />
-  <link rel="icon" type="image/png" href="/images/pYj3rmMAFIiElLWFTEDjLVap2Y.png" />
-  <link rel="apple-touch-icon" href="/images/wsiFMP6AyhD9kT30CeTkT4O6nNk.png" />
-
-  <!-- Open Graph -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Scyne Studio · Websites, automation, AI assistants and ads</title>
+  <meta name="description" content="Walk through the Scyne studio. We build websites, connect the tools that take repetitive work off your team, set up AI assistants that answer customers, and run Google and Meta ads." />
+  <link rel="canonical" href="https://scyne.studio/" />
+  <meta name="theme-color" content="#07070a" />
+  <meta name="color-scheme" content="dark" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Scyne — Brand &amp; Digital Design Studio" />
-  <meta property="og:description" content="Independent minds creating distinctive brands, expressive websites and thoughtful digital experiences." />
-  <meta property="og:image" content="/images/ws4amg82ncHwc5izuYrR6m7k3c.png" />
-
-  <link rel="stylesheet" href="/src/styles/index.css" />
+  <meta property="og:site_name" content="Scyne" />
+  <meta property="og:url" content="https://scyne.studio/" />
+  <meta property="og:title" content="Scyne Studio" />
+  <meta property="og:description" content="Websites, automation, AI assistants and ads, built by one team." />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- fonts load without holding up the first paint (text shows in the fallback, then swaps) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@500..800&family=Instrument+Sans:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500..800&family=Instrument+Sans:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
+  <script>
+    document.documentElement.classList.add("js");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("rm");
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Scyne",
+    "url": "https://scyne.studio/",
+    "email": "hello@scyne.studio",
+    "description": "Websites, automation, AI assistants and Google and Meta ads for growing businesses."
+  }
+  </script>
 </head>
 <body>
+  <a class="skip" href="#read">Skip the 3D tour</a>
 
-  <!-- Preloader Screen -->
-  <div id="preloader">
-    <div class="loader-brand">
-      <span>Scyne</span>
-      <span class="loader-reg">R</span>
-    </div>
+  <div class="loader" aria-hidden="true">
+    <span class="loader__t">Opening the 3D studio</span><span class="loader__count">0%</span>
+    <span class="loader__line"><i></i></span>
   </div>
 
-  <!-- Interactive Custom Cursor -->
-  <div class="custom-cursor">
-    <div class="custom-cursor-dot"></div>
-    <div class="custom-cursor-badge"></div>
+  <!-- A photo of the studio paints at once; the live 3D studio fades in over it when ready -->
+  <div class="posters" aria-hidden="true">
+    <picture class="poster is-on" data-stop="intro">
+      <source media="(max-aspect-ratio: 4/5)" type="image/avif" srcset="/posters/intro-port-480.avif 480w, /posters/intro-port-720.avif 720w, /posters/intro-port-840.avif 840w, /posters/intro-port-1080.avif 1080w" sizes="100vw" />
+      <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcset="/posters/intro-port-480.webp 480w, /posters/intro-port-720.webp 720w, /posters/intro-port-840.webp 840w, /posters/intro-port-1080.webp 1080w" sizes="100vw" />
+      <source type="image/avif" srcset="/posters/intro-land-960.avif 960w, /posters/intro-land-1440.avif 1440w, /posters/intro-land-1920.avif 1920w" sizes="100vw" />
+      <source type="image/webp" srcset="/posters/intro-land-960.webp 960w, /posters/intro-land-1440.webp 1440w, /posters/intro-land-1920.webp 1920w" sizes="100vw" />
+      <img src="/posters/intro-land-1440.webp" alt="" width="1920" height="1200" fetchpriority="high" decoding="async" />
+    </picture>
   </div>
+  <canvas class="world" aria-hidden="true"></canvas>
+  <div class="shade" aria-hidden="true"></div>
+  <div class="tags" aria-hidden="true"></div>
+  <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
 
-  <!-- Background 3D Raymarched Metal Sculpture Canvas -->
-  <div class="sculpture-container" id="sculpture-container" aria-hidden="true">
-    <canvas id="sculpture-canvas" class="sculpture-canvas"></canvas>
-  </div>
-
-  <!-- Top Sticky Navigation -->
-  <header class="site-header">
-    <a href="#" class="brand-link" data-cursor="HOME">
-      <svg class="brand-logo-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="10" height="24" rx="5" transform="rotate(-30 2 2)" fill="#ffffff" />
-        <rect x="16" y="8" width="10" height="24" rx="5" transform="rotate(-30 16 8)" fill="#fc201f" />
+  <header class="nav">
+    <a class="nav__brand" href="#stop-intro" aria-label="Scyne Studio, back to the start">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="6" y="5" width="8" height="22" rx="4" transform="rotate(30 10 16)" fill="#ece8df" />
+        <rect x="18" y="5" width="8" height="22" rx="4" transform="rotate(30 22 16)" fill="#ff3d1f" />
       </svg>
       <span>Scyne</span>
-      <span class="brand-reg">R</span>
     </a>
-
-    <div class="header-actions">
-      <button class="menu-pill-btn" id="menu-toggle" aria-label="Open Navigation Menu" data-cursor="MENU">
-        <span class="menu-pill-icon">
-          <span></span>
-          <span></span>
-        </span>
-        <span>MENU</span>
-      </button>
+    <div class="nav__right">
+      <button type="button" class="sound" aria-pressed="false" aria-label="Turn studio sound on"><span class="sound__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="sound__t">Sound off</span></button>
+      <div class="mode" role="group" aria-label="Studio view">
+        <button type="button" class="mode__btn is-on" data-wire="0" aria-pressed="true">Real</button>
+        <button type="button" class="mode__btn" data-wire="1" aria-pressed="false">Machine</button>
+      </div>
+      <nav class="pill" aria-label="Primary">
+        <a href="#read">Services</a>
+        <span class="pill__wave" aria-hidden="true"></span>
+        <a href="#work">Work</a>
+        <span class="pill__wave" aria-hidden="true"></span>
+        <a href="#contact">Contact</a>
+      </nav>
     </div>
   </header>
 
-  <!-- Full-screen Overlay Menu Drawer -->
-  <div class="menu-overlay" id="menu-overlay" role="dialog" aria-modal="true">
-    <div class="menu-header">
-      <div class="mono" style="color: var(--text-muted);">Scyne / Independent creative studio</div>
-      <button class="menu-close-btn" id="menu-close" data-cursor="CLOSE">CLOSE [ESC]</button>
-    </div>
+  <p class="progress" aria-hidden="true"><span class="progress__n">00</span><span class="progress__bar"><i></i></span><span class="progress__t">Overview</span></p>
 
-    <ul class="menu-nav-list">
-      <li>
-        <a href="#intro" class="menu-nav-link" data-cursor="GO">
-          <span class="num">01</span>
-          <span>Home</span>
-        </a>
-      </li>
-      <li>
-        <a href="#work" class="menu-nav-link" data-cursor="GO">
-          <span class="num">02</span>
-          <span>Works (10)</span>
-        </a>
-      </li>
-      <li>
-        <a href="#approach" class="menu-nav-link" data-cursor="GO">
-          <span class="num">03</span>
-          <span>Approach</span>
-        </a>
-      </li>
-      <li>
-        <a href="#services" class="menu-nav-link" data-cursor="GO">
-          <span class="num">04</span>
-          <span>Services</span>
-        </a>
-      </li>
-      <li>
-        <a href="#contact" class="menu-nav-link" data-cursor="GO">
-          <span class="num">05</span>
-          <span>Contact</span>
-        </a>
-      </li>
-    </ul>
-
-    <div class="menu-footer">
-      <div class="mono">Independent minds. Shared ambition.</div>
-      <div class="menu-social-links">
-        <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://pinterest.com" target="_blank" rel="noopener">Pinterest</a>
-        <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
-      </div>
-    </div>
-  </div>
+  <div class="drawer-shade" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+    <button type="button" class="drawer__close" aria-label="Close details">Close <span aria-hidden="true">✕</span></button>
+    <div class="drawer__body"></div>
+  </aside>
 
   <main>
-
-    <!-- SECTION 00 / INTRO (HERO) -->
-    <section class="hero-section" id="intro">
-      <div class="hero-content">
-        <div class="tag-label mono">
-          <span>00 / INTRO</span>
-          <span class="jp-accent">創造</span>
-        </div>
-        <h1 class="hero-title">
-          Ideas made<br />
-          unforgettable<span class="dot">.</span>
-        </h1>
-        <p class="hero-lead">
-          Brands, websites and digital products with a clear point of view.
-        </p>
-
-        <!-- Scyne Action Links with Arrow -->
-        <div class="hero-link-actions">
-          <a href="#contact" class="scyne-link" data-cursor="CONTACT">
-            <span>START A PROJECT</span>
-            <span class="arrow-sym">↗</span>
-          </a>
-          <a href="#work" class="scyne-link" data-cursor="EXPLORE">
-            <span>EXPLORE OUR WORK</span>
-            <span class="arrow-sym">↗</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="hero-bottom-bar">
-        <div class="scroll-prompt mono">
-          <span class="arrow-down">↓</span>
-          <span>SCROLL TO DISCOVER</span>
-        </div>
-        <div class="studio-badge-wrapper">
-          <svg class="globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            <path d="M2 12h20"/>
-          </svg>
-          <div class="mono studio-badge-copy">
-            <span>INDEPENDENT IN SPIRIT.</span>
-            <span>CONNECTED BY DESIGN.</span>
+    <!-- ================= THE TOUR ================= -->
+    <section class="tour" aria-label="Studio tour">
+      <article class="stop is-on" id="stop-intro" data-stop="intro" data-name="Overview">
+        <div class="cap cap--intro">
+          <p class="cap__k">Scyne Studio</p>
+          <h1 class="cap__h1">We make businesses easier to find, easier to buy from, and easier to run.</h1>
+          <p class="cap__p">Come down into our studio. Every corner of the room is something we build for clients. Scroll to walk through it, or click anything that lights up.</p>
+          <div class="cap__row">
+            <span class="cap__scroll"><i aria-hidden="true"></i>Scroll to walk down</span>
+            <a class="cap__skip" href="#read">Skip the tour ↓</a>
           </div>
         </div>
-      </div>
+      </article>
+
+      <article class="stop" id="stop-websites" data-stop="websites" data-name="Websites">
+        <div class="cap">
+          <p class="cap__k"><b>01</b> Websites</p>
+          <h2 class="cap__h">Sites people can actually use.</h2>
+          <p class="cap__p">Fast, clear websites that explain what you sell and make it easy to buy, book or call. Watch one being built from a short brief: layout, header, booking form, mobile version and checks, then it goes live and takes its first booking.</p>
+          <a class="cap__more" href="#svc-websites">How we build websites →</a>
+        </div>
+      </article>
+
+      <article class="stop" id="stop-automation" data-stop="automation" data-name="Automation">
+        <div class="cap">
+          <p class="cap__k"><b>02</b> Automation</p>
+          <h2 class="cap__h">Sit back. It's handled.</h2>
+          <p class="cap__p">Emails answered, meetings booked, support chats closed, invoices sent and new leads saved, while nobody touches a keyboard. We set up the systems that do your repetitive work in the background, every day.</p>
+          <a class="cap__more" href="#svc-automation">What we automate →</a>
+        </div>
+      </article>
+
+      <article class="stop" id="stop-assistants" data-stop="assistants" data-name="AI assistants">
+        <div class="cap">
+          <p class="cap__k"><b>03</b> AI assistants</p>
+          <h2 class="cap__h">Every call answered, any hour.</h2>
+          <p class="cap__p">Assistants that pick up calls and messages, answer common questions and book appointments, using only your own information. Nobody is in the room: the phone rings, the assistant answers, books Saturday 10:30 and sends the confirmation.</p>
+          <a class="cap__more" href="#svc-assistants">What assistants can do →</a>
+        </div>
+      </article>
+
+      <article class="stop" id="stop-ads" data-stop="ads" data-name="Ads">
+        <div class="cap">
+          <p class="cap__k"><b>04</b> Google &amp; Meta Ads</p>
+          <h2 class="cap__h">Test, keep, stop. Every week.</h2>
+          <p class="cap__p">We run several versions of each ad, keep the ones that bring customers at a sensible cost, and switch off the rest. The wall shows this week's results.</p>
+          <a class="cap__more" href="#svc-ads">How we run ads →</a>
+        </div>
+      </article>
+
+      <article class="stop" id="stop-contact" data-stop="contact" data-name="Exit">
+        <div class="cap">
+          <p class="cap__k">That's the studio</p>
+          <h2 class="cap__h cap__h--big">Let's talk.</h2>
+          <p class="cap__p">Tell us what your business needs. We reply to every message ourselves.</p>
+          <div class="cap__row">
+            <a class="btn btn--red" href="#contact">Start a project</a>
+            <a class="cap__skip" href="#read">Read it all in plain text ↓</a>
+          </div>
+        </div>
+      </article>
     </section>
 
-    <!-- SECTION 01 / THE STUDIO -->
-    <section class="studio-section section-wrapper" id="studio">
-      <div class="tag-label mono">
-        <span>01 / THE STUDIO</span>
-        <span class="jp-accent">私たち</span>
-      </div>
-      <div class="studio-grid">
-        <h2 class="statement-heading">
-          We build brands and websites that turn a clear idea into a distinctive experience.
-        </h2>
-        <div class="statement-sub">
-          <p>
-            From positioning and visual identity to interface design and Framer development, we connect every part of your digital presence.
-          </p>
-          <a href="#approach" class="scyne-link" style="margin-top: 28px;" data-cursor="VIEW">
-            <span>OUR APPROACH</span>
-            <span class="arrow-sym">↗</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 02 / VISION -->
-    <section class="vision-section" id="vision">
-      <div class="marquee-container" aria-hidden="true">
-        <div class="marquee-track">
-          <div class="marquee-item">
-            <span>SHAPE 造形</span>
-            <span class="marquee-plus">+</span>
-            <span>EVOLVE 進化</span>
-            <span class="marquee-plus">+</span>
-            <span>IMAGINE 想像</span>
-            <span class="marquee-plus">+</span>
-            <span>SHAPE 造形</span>
-            <span class="marquee-plus">+</span>
-            <span>EVOLVE 進化</span>
-            <span class="marquee-plus">+</span>
-            <span>IMAGINE 想像</span>
-            <span class="marquee-plus">+</span>
-          </div>
-          <div class="marquee-item">
-            <span>SHAPE 造形</span>
-            <span class="marquee-plus">+</span>
-            <span>EVOLVE 進化</span>
-            <span class="marquee-plus">+</span>
-            <span>IMAGINE 想像</span>
-            <span class="marquee-plus">+</span>
-            <span>SHAPE 造形</span>
-            <span class="marquee-plus">+</span>
-            <span>EVOLVE 進化</span>
-            <span class="marquee-plus">+</span>
-            <span>IMAGINE 想像</span>
-            <span class="marquee-plus">+</span>
+    <!-- ================= THE READABLE VERSION ================= -->
+    <div class="plain" id="read">
+      <section class="block" aria-labelledby="svc-title">
+        <div class="wrap">
+          <header class="block__head">
+            <p class="kicker">What we do</p>
+            <h2 class="block__title" id="svc-title">Four things, built by one team.</h2>
+          </header>
+          <div class="svc-grid">
+            <article class="svc" id="svc-websites">
+              <span class="svc__n">01</span>
+              <h3>Websites</h3>
+              <p>We design and build sites that explain what you sell in plain words and make it simple to buy, book or call. They load quickly on phones and are built to show up in search.</p>
+              <ul><li>Design and development</li><li>Online stores</li><li>Landing pages for campaigns</li><li>Search optimisation</li></ul>
+            </article>
+            <article class="svc" id="svc-automation">
+              <span class="svc__n">02</span>
+              <h3>Automation</h3>
+              <p>We connect the tools you already use so leads, orders, invoices and reminders move on their own. Your team spends its time on customers instead of spreadsheets.</p>
+              <ul><li>CRM setup</li><li>WhatsApp and email follow-ups</li><li>Bookings and payments</li><li>Reports that update themselves</li></ul>
+            </article>
+            <article class="svc" id="svc-assistants">
+              <span class="svc__n">03</span>
+              <h3>AI assistants</h3>
+              <p>Assistants that answer common questions, book appointments and sort incoming documents, using only your information. Anything they can't handle goes straight to the right person.</p>
+              <ul><li>Website and WhatsApp chat</li><li>Appointment booking</li><li>Document sorting</li><li>Search across your own files</li></ul>
+            </article>
+            <article class="svc" id="svc-ads">
+              <span class="svc__n">04</span>
+              <h3>Google &amp; Meta Ads</h3>
+              <p>We plan, make and run campaigns on Google, Instagram and Facebook. Every week we test new versions, keep what brings customers at a sensible cost, and stop the rest.</p>
+              <ul><li>Search and Shopping ads</li><li>Instagram and Facebook ads</li><li>Ad creative</li><li>Tracking and weekly reports</li></ul>
+            </article>
           </div>
         </div>
-      </div>
-      <p class="vision-tagline mono">✦ A THOUGHT BECOMES A WORLD.</p>
-    </section>
+      </section>
 
-    <!-- SECTION 03 / OUR APPROACH BENTO GRID -->
-    <section class="approach-section section-wrapper" id="approach">
-      <div class="tag-label mono">
-        <span>03 / OUR APPROACH</span>
-        <span class="jp-accent">姿勢</span>
-      </div>
-
-      <div class="section-title-row">
-        <h2 class="section-main-heading">A closer look.</h2>
-        <p class="section-desc">A clear process. From first conversation to launch.</p>
-      </div>
-
-      <!-- Bento Grid -->
-      <div class="scyne-bento-grid">
-        
-        <!-- Card 1: Crimson Red Card (Top Left, 2 Cols) -->
-        <article class="bento-box bento-red" data-cursor="PROCESS">
-          <div class="bento-top-tag mono">DISCOVER / DESIGN / BUILD</div>
-          <div class="bento-huge-num">03</div>
-          <p class="bento-body-text">
-            First we define the brief. Then we design the direction and build it for the web.
-          </p>
-        </article>
-
-        <!-- Card 2: Tall Art Direction Card (Right, Spans 2 Rows) -->
-        <article class="bento-box bento-portrait" data-cursor="ART">
-          <div class="bento-top-tag mono">ART DIRECTION / CONCEPT STUDY</div>
-          <div class="bento-portrait-img-wrap">
-            <img src="/images/pNDjAyywepS1TLOWplJQ6DmZ30.png" alt="Editorial design study" loading="lazy" />
-          </div>
-          <h3 class="bento-portrait-title">
-            Designed around people.<span class="dot-red">•</span>
-          </h3>
-        </article>
-
-        <!-- Card 3: One Shared Brief (Middle Left, 1 Col) -->
-        <article class="bento-box bento-standard" data-cursor="BRIEF">
-          <div class="bento-top-tag mono">ONE SHARED BRIEF</div>
-          <div class="bento-huge-num">01</div>
-          <p class="bento-standard-text">
-            A clear scope, priorities and checkpoints before production begins.
-          </p>
-        </article>
-
-        <!-- Card 4: Ready For Launch (Middle Center, 1 Col) -->
-        <article class="bento-box bento-standard" data-cursor="LAUNCH">
-          <div class="bento-top-tag mono">READY FOR LAUNCH</div>
-          <div class="bento-huge-num">GO</div>
-          <p class="bento-standard-text">
-            Responsive layouts, interaction checks and a handover you can use.
-          </p>
-        </article>
-
-        <!-- Card 5: Material Exploration (Bottom Left, 1 Col) -->
-        <article class="bento-box bento-media-card" data-cursor="TEXTURE">
-          <div class="bento-top-tag mono">Scyne / MATERIAL EXPLORATION</div>
-          <div class="bento-media-img-wrap">
-            <img src="/images/lSvkRh08IW3ry15pTbdpy3Ja8WQ.png" alt="Material exploration" loading="lazy" />
-          </div>
-          <h3 class="bento-media-title">Precision. With personality.</h3>
-        </article>
-
-        <!-- Card 6: Digital Experiences / Made Human (Bottom Center & Right, 2 Cols) -->
-        <article class="bento-box bento-media-card bento-wide" data-cursor="PRODUCT">
-          <div class="bento-top-tag mono">DIGITAL EXPERIENCES / MADE HUMAN</div>
-          <div class="bento-media-img-wrap bento-watch-wrap">
-            <img src="/images/UxDodElMcEIQykAkocF933Ylps.png" alt="Smartwatch interface study" loading="lazy" />
-          </div>
-          <h3 class="bento-media-title">Small screen. Clear decisions.</h3>
-        </article>
-
-      </div>
-
-      <div class="approach-bottom-banner mono">
-        INDEPENDENT THINKING / COLLECTIVE CRAFT / LASTING VALUE
-      </div>
-    </section>
-
-    <!-- SECTION 04 / SELECTED WORKS (PINNED SLIDER) -->
-    <section class="works-pinned-section" id="work">
-      <!-- Pinned Left Header Column -->
-      <div class="works-pinned-sidebar">
-        <div class="tag-row">
-          <span class="red-beacon"></span>
-          <div class="tag-label mono" style="margin-bottom: 0;">
-            <span>04 / SELECTED WORKS</span>
-            <span class="jp-accent">制作</span>
-          </div>
+      <section class="block" id="work" aria-labelledby="work-title">
+        <div class="wrap">
+          <header class="block__head">
+            <p class="kicker">Work</p>
+            <h2 class="block__title" id="work-title">Recent projects.</h2>
+          </header>
+          <ul class="work">
+            <li class="work__row" data-placeholder><span class="work__name">Dental clinic group</span><span class="work__what">Website, booking automation, Google Ads</span><span class="work__year">2025</span></li>
+            <li class="work__row" data-placeholder><span class="work__name">Skincare brand</span><span class="work__what">Online store, Instagram and Facebook ads</span><span class="work__year">2025</span></li>
+            <li class="work__row" data-placeholder><span class="work__name">Real estate developer</span><span class="work__what">Landing pages, Google Ads, lead follow-up</span><span class="work__year">2024</span></li>
+            <li class="work__row" data-placeholder><span class="work__name">Logistics company</span><span class="work__what">Internal tools, reporting automation</span><span class="work__year">2024</span></li>
+          </ul>
         </div>
+      </section>
 
-        <h2 class="works-sidebar-title">
-          Ideas out<br />
-          in the world.
-        </h2>
-      </div>
+      <section class="block" id="process" aria-labelledby="process-title">
+        <div class="wrap">
+          <header class="block__head">
+            <p class="kicker">How a project runs</p>
+            <h2 class="block__title" id="process-title">Four steps, no surprises.</h2>
+          </header>
+          <ol class="steps">
+            <li><span>1</span><h3>Call</h3><p>Thirty minutes on your business, your customers and what is not working today.</p></li>
+            <li><span>2</span><h3>Plan</h3><p>A written plan with scope, timeline and a fixed price. You decide before any work starts.</p></li>
+            <li><span>3</span><h3>Build</h3><p>We design, build and test. You see progress every week and can comment at any time.</p></li>
+            <li><span>4</span><h3>Improve</h3><p>After launch we measure what happens and keep improving the parts that matter most.</p></li>
+          </ol>
+        </div>
+      </section>
 
-      <!-- Toggle Button above card -->
-      <button class="card-cross-btn" aria-label="Toggle details">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <section class="block" aria-labelledby="promise-title">
+        <div class="wrap">
+          <header class="block__head">
+            <p class="kicker">What you can expect</p>
+            <h2 class="block__title" id="promise-title">Three promises.</h2>
+          </header>
+          <dl class="promises">
+            <div><dt>One team</dt><dd>Design, development, automation and ads under one roof, so nothing gets lost between agencies.</dd></div>
+            <div><dt>Plain reports</dt><dd>We report on enquiries, sales and what each customer cost. Not on impressions.</dd></div>
+            <div><dt>You own it</dt><dd>Code, ad accounts, tools and data are set up in your name from day one.</dd></div>
+          </dl>
+        </div>
+      </section>
 
-      <!-- Horizontally Scrolling Project Cards Track -->
-      <div class="works-slider-track">
-
-        <!-- Card 1: Aether -->
-        <article class="project-slide-card" data-cursor="VIEW">
-          <div class="slide-media-wrap">
-            <img src="/images/ws4amg82ncHwc5izuYrR6m7k3c.png" alt="Aether AI interface design" loading="lazy" />
+      <section class="block block--contact" id="contact" aria-labelledby="contact-title">
+        <div class="wrap contact">
+          <div class="contact__copy">
+            <p class="kicker">Contact</p>
+            <h2 class="contact__title" id="contact-title">Let's talk.</h2>
+            <p class="contact__p">Tell us what you need. We reply to every message ourselves.</p>
+            <a class="contact__mail" href="mailto:hello@scyne.studio">hello@scyne.studio</a>
           </div>
-          <div class="slide-info">
-            <div class="slide-tag mono">01 / DIGITAL PRODUCT</div>
-            <h3 class="slide-title">Aether</h3>
-            <p class="slide-desc">
-              Making AI tools easier to navigate. Product positioning, interface direction and a focused landing-page concept.
-            </p>
-          </div>
-        </article>
-
-        <!-- Card 2: Noct -->
-        <article class="project-slide-card" data-cursor="VIEW">
-          <div class="slide-media-wrap">
-            <img src="/images/Y8CuMjp97ZIPwsYO7FCiwfWCuw.png" alt="Noct independent fashion" loading="lazy" />
-          </div>
-          <div class="slide-info">
-            <div class="slide-tag mono">02 / CULTURE &amp; FASHION</div>
-            <h3 class="slide-title">Noct</h3>
-            <p class="slide-desc">
-              Giving independent fashion an editorial voice. Art direction, typography and a responsive website concept.
-            </p>
-          </div>
-        </article>
-
-        <!-- Card 3: Sora Living -->
-        <article class="project-slide-card" data-cursor="VIEW">
-          <div class="slide-media-wrap">
-            <img src="/images/2qCpz8LhSsfuwNGPFUJWJDsT8A.png" alt="Sora Living architecture showcase" loading="lazy" />
-          </div>
-          <div class="slide-info">
-            <div class="slide-tag mono">03 / ARCHITECTURE</div>
-            <h3 class="slide-title">Sora Living</h3>
-            <p class="slide-desc">
-              Helping architecture speak through space and imagery. Visual direction and a project-led website concept.
-            </p>
-          </div>
-        </article>
-
-        <!-- Card 4: Forma -->
-        <article class="project-slide-card" data-cursor="VIEW">
-          <div class="slide-media-wrap">
-            <img src="/images/7hQXtXjg3yy0QIhemR4kqWrrym8.png" alt="Forma brand system" loading="lazy" />
-          </div>
-          <div class="slide-info">
-            <div class="slide-tag mono">04 / BRAND &amp; WEB</div>
-            <h3 class="slide-title">Forma</h3>
-            <p class="slide-desc">
-              Turning a distinct point of view into a brand system. Identity exploration, art direction and website design.
-            </p>
-          </div>
-        </article>
-
-        <!-- End Slide: Your next big move -->
-        <article class="project-slide-card works-end-slide" data-cursor="VIEW">
-          <div class="works-end-inner">
-            <div class="works-end-icon" aria-hidden="true">
-              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
-                <rect x="2" y="2" width="10" height="24" rx="5" transform="rotate(-30 2 2)" fill="#fc201f" />
-                <rect x="16" y="8" width="10" height="24" rx="5" transform="rotate(-30 16 8)" fill="#fc201f" />
-              </svg>
+          <form class="form" id="contact-form" novalidate data-endpoint="">
+            <div class="form__row">
+              <label class="field"><span>Name</span><input id="f-name" name="name" type="text" autocomplete="name" required /></label>
+              <label class="field"><span>Email</span><input id="f-email" name="email" type="email" autocomplete="email" required /></label>
             </div>
-            <div class="mono works-end-tag">NEXT / YOUR AMBITION</div>
-            <h3 class="works-end-heading">Your next big<br/>move.</h3>
-            <p class="works-end-sub">A new brand. A better experience. A bold next chapter.<br/>Let's build it together.</p>
-            <a href="#contact" class="scyne-link works-end-link" data-cursor="CONTACT">
-              <span>ALL WORKS</span>
-              <span class="arrow-sym">↗</span>
-            </a>
-          </div>
-        </article>
-
-      </div>
-
-      <!-- Bottom Span Progress Track -->
-      <div class="works-bottom-bar">
-        <div class="works-counter mono">
-          <span class="curr-idx">01</span> / <span class="total-idx">04</span>
-        </div>
-        <div class="works-progress-line-track">
-          <div class="works-progress-fill"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 05 / SERVICES -->
-    <section class="services-section section-wrapper" id="services">
-      <div class="tag-label mono">
-        <span>05 / SERVICES</span>
-        <span class="jp-accent">領域</span>
-      </div>
-
-      <div class="section-title-row">
-        <h2 class="section-main-heading">One connected process.</h2>
-        <p class="section-desc">A clear deliverable at every stage. No silos, no handoff friction.</p>
-      </div>
-
-      <div class="services-list">
-        <!-- Service 01 -->
-        <div class="service-item open" data-cursor="TOGGLE">
-          <div class="service-summary">
-            <div class="service-left">
-              <span class="service-num">(01)</span>
-              <h3 class="service-name">Strategy</h3>
+            <fieldset class="field">
+              <legend>What do you need?</legend>
+              <div class="picks">
+                <label><input type="checkbox" name="need" value="Website" /><span>Website</span></label>
+                <label><input type="checkbox" name="need" value="Automation" /><span>Automation</span></label>
+                <label><input type="checkbox" name="need" value="AI assistant" /><span>AI assistant</span></label>
+                <label><input type="checkbox" name="need" value="Ads" /><span>Google &amp; Meta Ads</span></label>
+              </div>
+            </fieldset>
+            <label class="field"><span>Tell us a little about it</span><textarea id="f-msg" name="message" rows="4"></textarea></label>
+            <div class="form__foot">
+              <button class="btn btn--red" type="submit">Send</button>
+              <p class="form__status" role="status" aria-live="polite"></p>
             </div>
-            <span class="service-plus">+</span>
-          </div>
-          <div class="service-details">
-            <p class="service-desc">
-              Defining the core foundation before design begins. We clarify your market positioning, define audience personas, and create structured digital roadmaps.
-            </p>
-            <ul class="service-deliverables">
-              <li>Brand Positioning &amp; Value Proposition</li>
-              <li>Competitive Benchmarking &amp; Research</li>
-              <li>Information Architecture &amp; User Flow</li>
-              <li>Content Strategy &amp; Editorial Tone</li>
-            </ul>
+          </form>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="wrap footer__inner">
+          <p class="footer__big" aria-hidden="true">Scyne</p>
+          <div class="footer__row">
+            <span>© <span data-year>2026</span> Scyne Studio</span>
+            <a href="mailto:hello@scyne.studio">hello@scyne.studio</a>
+            <a href="https://www.linkedin.com/" rel="noopener" data-placeholder>LinkedIn</a>
+            <a href="https://www.instagram.com/" rel="noopener" data-placeholder>Instagram</a>
+            <a href="#stop-intro">Back to the studio ↑</a>
           </div>
         </div>
-
-        <!-- Service 02 -->
-        <div class="service-item" data-cursor="TOGGLE">
-          <div class="service-summary">
-            <div class="service-left">
-              <span class="service-num">(02)</span>
-              <h3 class="service-name">Identity</h3>
-            </div>
-            <span class="service-plus">+</span>
-          </div>
-          <div class="service-details">
-            <p class="service-desc">
-              Translating strategy into expressive visual systems. Distinct typography, cohesive palettes, bespoke 3D assets, and living design tokens.
-            </p>
-            <ul class="service-deliverables">
-              <li>Visual Identity Systems &amp; Guidelines</li>
-              <li>Typography Pairing &amp; Custom Lettering</li>
-              <li>Art Direction &amp; Asset Production</li>
-              <li>3D Elements &amp; Brand Motion Language</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Service 03 -->
-        <div class="service-item" data-cursor="TOGGLE">
-          <div class="service-summary">
-            <div class="service-left">
-              <span class="service-num">(03)</span>
-              <h3 class="service-name">Digital design</h3>
-            </div>
-            <span class="service-plus">+</span>
-          </div>
-          <div class="service-details">
-            <p class="service-desc">
-              Creating intuitive interfaces that elevate digital products. High-fidelity layouts, micro-interactions, responsive grids, and design system component libraries.
-            </p>
-            <ul class="service-deliverables">
-              <li>UI/UX Design for Web &amp; Mobile</li>
-              <li>Interactive Figma &amp; Framer Prototypes</li>
-              <li>Component Libraries &amp; Design Tokens</li>
-              <li>Conversion &amp; Landing Page Architecture</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Service 04 -->
-        <div class="service-item" data-cursor="TOGGLE">
-          <div class="service-summary">
-            <div class="service-left">
-              <span class="service-num">(04)</span>
-              <h3 class="service-name">Development</h3>
-            </div>
-            <span class="service-plus">+</span>
-          </div>
-          <div class="service-details">
-            <p class="service-desc">
-              Engineering with production-grade performance and fluid motion. Custom WebGL shaders, Framer components, GSAP timeline choreography, and SEO optimization.
-            </p>
-            <ul class="service-deliverables">
-              <li>Framer &amp; WebGL Creative Engineering</li>
-              <li>Fluid 60FPS Micro-interactions</li>
-              <li>Clean Semantic HTML &amp; Core Web Vitals</li>
-              <li>CMS Architecture &amp; Client Handover</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 06 / CLIENT PERSPECTIVES -->
-    <section class="clients-section section-wrapper" id="testimonials">
-      <div class="tag-label mono">
-        <span>06 / CLIENT PERSPECTIVES</span>
-        <span class="jp-accent">声</span>
-      </div>
-
-      <div class="section-title-row">
-        <h2 class="section-main-heading">Better, together.</h2>
-        <p class="section-desc">Collaborative partnerships with ambitious founders and design leads.</p>
-      </div>
-
-      <div class="testimonials-grid">
-        <!-- Review 1 -->
-        <article class="testimonial-card">
-          <p class="testimonial-quote">
-            "Scyne helped us articulate what made Aether different. The interface design felt considered, unmistakably premium, and our launch metrics exceeded every forecast."
-          </p>
-          <div class="testimonial-author-row">
-            <img src="/images/z8nEER7qBAhTZLrDV810NQRwU.png" alt="Mila Arden" class="author-avatar" loading="lazy" />
-            <div>
-              <div class="author-name">Mila Arden</div>
-              <div class="author-meta">Founder, Aether AI</div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Review 2 -->
-        <article class="testimonial-card">
-          <p class="testimonial-quote">
-            "From the first conversation, they brought clarity to our visual identity. The digital experience gave Noct the exact editorial presence we envisioned."
-          </p>
-          <div class="testimonial-author-row">
-            <img src="/images/KWUa5ad8Sj8Gzp67jrjyb3jwDD4.png" alt="Leo Mercer" class="author-avatar" loading="lazy" />
-            <div>
-              <div class="author-name">Leo Mercer</div>
-              <div class="author-meta">Creative Director, Noct</div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Review 3 -->
-        <article class="testimonial-card">
-          <p class="testimonial-quote">
-            "They treated our architectural portfolio with the same spatial care we give to buildings. Responsive, collaborative, and impeccably executed."
-          </p>
-          <div class="testimonial-author-row">
-            <img src="/images/wzlxx248lX7l1gFsWeou7XiS0GQ.png" alt="Nora Chen" class="author-avatar" loading="lazy" />
-            <div>
-              <div class="author-name">Nora Chen</div>
-              <div class="author-meta">Principal, Sora Living</div>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- SECTION 07 / ALWAYS IN MOTION (3D CASE RING) -->
-    <section class="ring-section" id="motion">
-      <!-- Background Typography Layer: motion is behind 3D cards -->
-      <div class="ring-backdrop-layer">
-        <div class="tag-row ring-top-tag">
-          <span class="red-beacon"></span>
-          <div class="tag-label mono" style="margin-bottom: 0;">
-            <span>07 / ALWAYS IN MOTION</span>
-            <span class="jp-accent">探求</span>
-          </div>
-        </div>
-        <h2 class="ring-main-heading">
-          <span class="ring-heading-line1">Always in</span>
-          <span class="ring-heading-line2">motion.</span>
-        </h2>
-      </div>
-
-      <!-- 3D Interactive Case Ring WebGL Canvas Layer -->
-      <div class="ring-canvas-fullscreen" id="ring-container" data-cursor="DRAG 3D">
-        <canvas id="ring-canvas" class="ring-canvas"></canvas>
-      </div>
-
-      <!-- Foreground Interactive Overlay Layer (z-index: 5, pointer-events: none) -->
-      <div class="ring-foreground-layer">
-        <!-- Top row: description text floated to right -->
-        <div class="ring-top-row">
-          <p class="ring-lead-text">
-            Studies in material, typography and digital
-            interaction. A space to test ideas before they become
-            products.
-          </p>
-        </div>
-        <!-- Bottom row: explore link on right -->
-        <div class="ring-bottom-row">
-          <a href="#work" class="scyne-link" data-cursor="EXPLORE">
-            <span>EXPLORE THE WORK</span>
-            <span class="arrow-sym">↗</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 08 / NEXT CHAPTER (CONTACT) -->
-    <section class="contact-section section-wrapper" id="contact">
-      <div class="tag-label mono">
-        <span>08 / NEXT CHAPTER</span>
-        <span class="jp-accent">終結</span>
-      </div>
-
-      <div class="contact-layout">
-        <div>
-          <h2 class="contact-huge-title">
-            Your idea.<br />
-            Our next obsession.
-          </h2>
-          <p style="color: var(--text-muted); font-size: 1.15rem; line-height: 1.6; max-width: 480px;">
-            Whether you are launching a new product, elevating an existing brand, or building a bespoke digital flagship, we'd love to hear your ambition.
-          </p>
-
-          <div class="contact-details">
-            <div class="mono" style="color: var(--text-muted);">DIRECT INQUIRY</div>
-            <a href="mailto:hello@scyne.studio" class="contact-email-link" data-cursor="EMAIL">
-              hello@scyne.studio
-            </a>
-            <div class="mono" style="color: var(--text-sub); margin-top: 12px;">
-              LOCATION: GLOBAL / REMOTE · TIMEZONE: UTC / EST
-            </div>
-          </div>
-        </div>
-
-        <!-- Interactive Contact Form -->
-        <form class="contact-form" id="contact-form" onsubmit="event.preventDefault(); alert('Thank you for reaching out to Scyne. We will respond within 24 hours.');">
-          <div class="form-group">
-            <label class="form-label" for="client-name">YOUR NAME *</label>
-            <input type="text" id="client-name" class="form-input" placeholder="e.g. Eleanor Vance" required />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="client-email">EMAIL ADDRESS *</label>
-            <input type="email" id="client-email" class="form-input" placeholder="e.g. eleanor@company.com" required />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="project-scope">PROJECT SCOPE</label>
-            <input type="text" id="project-scope" class="form-input" placeholder="Brand Identity / Framer Website / Digital Product" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="project-notes">ABOUT THE PROJECT</label>
-            <textarea id="project-notes" class="form-textarea" placeholder="Tell us about your timeline, goals, and ambition..."></textarea>
-          </div>
-
-          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;" data-cursor="SEND">
-            SEND INQUIRY ↗
-          </button>
-        </form>
-      </div>
-    </section>
-
+      </footer>
+    </div>
   </main>
-
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="footer-top">
-      <div class="mono" style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">
-        Scyne ®
-      </div>
-      <div class="footer-links">
-        <a href="#intro">HOME</a>
-        <a href="#work">WORKS</a>
-        <a href="#approach">APPROACH</a>
-        <a href="#services">SERVICES</a>
-        <a href="#contact">CONTACT</a>
-        <a href="#">PRIVACY POLICY</a>
-        <a href="#">TERMS OF USE</a>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <div>INDEPENDENT MINDS. SHARED AMBITION.</div>
-      <div>&copy; SCYNE 2026. ALL RIGHTS RESERVED.</div>
-      <div>DESIGNED &amp; ENGINEERED BY SCYNE</div>
-    </div>
-  </footer>
 
   <script type="module" src="/src/main.js"></script>
 </body>

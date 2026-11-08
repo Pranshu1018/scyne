@@ -1,50 +1,30 @@
-// Scyne Custom Interactive Cursor with Magnetic Snap and Mode Badges
+/* A small ring that follows the pointer. Over links it grows; over a station in the room
+   it becomes a red disc saying what a click will do. Fine pointers only. */
 
-export class CustomCursor {
-  constructor() {
-    this.cursor = document.querySelector(".custom-cursor");
-    this.dot = document.querySelector(".custom-cursor-dot");
-    this.badge = document.querySelector(".custom-cursor-badge");
-    if (!this.cursor) return;
+export function initCursor(gsap) {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return { station() {} };
+  const el = document.querySelector(".cursor");
+  const label = el.querySelector(".cursor__label");
+  document.documentElement.classList.add("has-cursor");
+  const xTo = gsap.quickTo(el, "x", { duration: 0.3, ease: "power3" });
+  const yTo = gsap.quickTo(el, "y", { duration: 0.3, ease: "power3" });
+  let overStation = false;
 
-    this.pos = { x: -100, y: -100 };
-    this.target = { x: -100, y: -100 };
-    this.isHovered = false;
+  window.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    el.classList.add("is-on");
+    xTo(e.clientX); yTo(e.clientY);
+    const link = e.target.closest("a, button, label, summary");
+    el.classList.toggle("is-link", !!link && !overStation);
+    el.classList.toggle("is-on", !e.target.closest("input, textarea"));
+  });
+  document.documentElement.addEventListener("pointerleave", () => el.classList.remove("is-on"));
 
-    this.init();
-  }
-
-  init() {
-    window.addEventListener("pointermove", (e) => {
-      this.target.x = e.clientX;
-      this.target.y = e.clientY;
-    }, { passive: true });
-
-    document.querySelectorAll("[data-cursor]").forEach((el) => {
-      el.addEventListener("mouseenter", () => {
-        const text = el.getAttribute("data-cursor");
-        if (text) {
-          this.badge.textContent = text;
-          this.cursor.classList.add("has-badge");
-        } else {
-          this.cursor.classList.add("hovered");
-        }
-      });
-      el.addEventListener("mouseleave", () => {
-        this.cursor.classList.remove("has-badge");
-        this.cursor.classList.remove("hovered");
-        this.badge.textContent = "";
-      });
-    });
-
-    const update = () => {
-      const dt = 0.18;
-      this.pos.x += (this.target.x - this.pos.x) * dt;
-      this.pos.y += (this.target.y - this.pos.y) * dt;
-
-      this.cursor.style.transform = `translate3d(${this.pos.x}px, ${this.pos.y}px, 0)`;
-      requestAnimationFrame(update);
-    };
-    requestAnimationFrame(update);
-  }
+  return {
+    station(text) {
+      overStation = !!text;
+      el.classList.toggle("is-station", overStation);
+      if (text) { label.textContent = text; el.classList.remove("is-link"); }
+    },
+  };
 }
