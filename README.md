@@ -37,6 +37,7 @@ A dusk city window on the left wall, stairs with a glass balustrade, the brand w
 - `src/world/furnish.js`: meeting table and the pieces along the walls
 - `src/world/stations/*.js`: one file per station, including the live screen drawings (each station's story runs on one timeline that all its screens read)
 - `src/world/chair.js`, `devices.js`: the task chair; the laptop, phone, mug and notebook shared by the stations
+- `src/ui/sections.js`, `src/styles/sections.css`: the page after the tour (services, example projects, numbers, process, quotes, promises, contact, footer) and its scroll motion; all of it reads complete without JavaScript or with reduced motion
 - `src/world/kit.js`, `perf.js`: shared materials and live screens; static-mesh merging
 - `src/world/bake.js`, `studio-material.js`: baked lighting (which meshes take part, loading and applying the bake) and the one shader that draws every baked surface
 - `tools/bake/`: the offline lighting bake (Blender Cycles) and packing for the web; see `tools/bake/README.md`
@@ -45,7 +46,7 @@ A dusk city window on the left wall, stairs with a glass balustrade, the brand w
 
 ### Assets and licences
 - Furniture, plants, decor, floor and wall textures, the walnut and white-oak veneers, the wool upholstery and the leather, and the lighting map: [Poly Haven](https://polyhaven.com), CC0. `node scripts-download.cjs` fetches the sources into `assets-src/`.
-- The man at the automation desk: Male_Adult_08 from the [Microsoft Rocketbox Avatar Library](https://github.com/microsoft/Microsoft-Rocketbox) (MIT). Started from its "sitting relaxed" motion capture, re-posed (leaning back, hands behind his head), given PBR materials and compressed to `public/models/man.glb` (~0.8 MB). The MIT notice ships next to it in `public/models/LICENSE-rocketbox.txt`.
+- The man at the automation desk: Male_Adult_08 from the [Microsoft Rocketbox Avatar Library](https://github.com/microsoft/Microsoft-Rocketbox) (MIT). Started from its "sitting relaxed" motion capture, given PBR materials and compressed to `public/models/man.glb` (~0.8 MB); `src/world/man.js` poses him at load (leaning back, hands behind his head). He can be replaced by a MetaHuman: see `tools/metahuman/README.md`. The MIT notice ships next to it in `public/models/LICENSE-rocketbox.txt`.
 - Built in code to real-world proportions: the task chair (`src/world/chair.js`: upholstered seat, curved mesh back, leather arm pads, polished aluminium base, twin-wheel castors), the laptop (unibody, real keys, glass display), the desks (continuous veneer tops with a satin lacquer), the mug, notebook, screens and job cards.
 
 ### Rendering

@@ -1,4 +1,5 @@
 import "./styles/main.css";
+import "./styles/sections.css";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,6 +9,8 @@ import { initForm } from "./ui/form.js";
 import { initDrawer } from "./ui/drawer.js";
 import { initCursor } from "./ui/cursor.js";
 import { initSound } from "./ui/sound.js";
+import { initSections } from "./ui/sections.js";
+import { asset } from "./asset-url.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,13 +45,13 @@ function canDraw3D() {
    AVIF, then WebP, with portrait crops for phones */
 const POSTER_W = { land: [960, 1440, 1920], port: [480, 720, 840, 1080] };
 function posterHTML(id) {
-  const set = (o, ext) => POSTER_W[o].map((w) => `/posters/${id}-${o}-${w}.${ext} ${w}w`).join(", ");
+  const set = (o, ext) => POSTER_W[o].map((w) => `${asset(`/posters/${id}-${o}-${w}.${ext}`)} ${w}w`).join(", ");
   return `<picture class="poster" data-stop="${id}">` +
     `<source media="(max-aspect-ratio: 4/5)" type="image/avif" srcset="${set("port", "avif")}" sizes="100vw">` +
     `<source media="(max-aspect-ratio: 4/5)" type="image/webp" srcset="${set("port", "webp")}" sizes="100vw">` +
     `<source type="image/avif" srcset="${set("land", "avif")}" sizes="100vw">` +
     `<source type="image/webp" srcset="${set("land", "webp")}" sizes="100vw">` +
-    `<img src="/posters/${id}-land-1440.webp" alt="" width="1920" height="1200" decoding="async"></picture>`;
+    `<img src="${asset(`/posters/${id}-land-1440.webp`)}" alt="" width="1920" height="1200" decoding="async"></picture>`;
 }
 const postersEl = document.querySelector(".posters");
 function showPoster(id) {
@@ -198,6 +201,11 @@ ScrollTrigger.create({
     root.classList.toggle("in-tour", self.isActive);
     studio && studio.setActive(self.isActive);
   },
+  // also on every recalculation (a reload or jump straight past the tour never "toggles")
+  onRefresh(self) {
+    root.classList.toggle("in-tour", self.isActive);
+    studio && studio.setActive(self.isActive);
+  },
 });
 stops.forEach((s, i) => {
   ScrollTrigger.create({
@@ -233,9 +241,10 @@ if (!reduce && "IntersectionObserver" in window) {
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
   }, { rootMargin: "0px 0px -10% 0px" });
-  document.querySelectorAll(".block__head, .svc, .work__row, .steps li, .promises > div, .form").forEach((el) => { el.classList.add("rv"); io.observe(el); });
+  document.querySelectorAll(".block__head, .svc, .case, .stats li, .quotes, .promises > div, .form").forEach((el) => { el.classList.add("rv"); io.observe(el); });
 }
 
+initSections({ gsap, ScrollTrigger, lenis, reduce, drawer });
 initForm();
 document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());

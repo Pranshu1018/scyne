@@ -7,8 +7,9 @@
    download that one small image and it is decoded on the GPU in a single pass. */
 
 import * as THREE from "three";
+import { asset } from "../asset-url.js";
 
-export const ENV_URL = "/env/room.webp";
+export const ENV_URL = asset("/env/room.webp");
 const W = 512, H = 256;
 
 /* Render the scene into a cube map from a point in the room */

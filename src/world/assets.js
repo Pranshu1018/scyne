@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+import { asset } from "../asset-url.js";
 
 export const MODELS = [
   "mid_century_lounge_chair", "modern_arm_chair_01", "Ottoman_01", "coffee_table_round_01",
@@ -42,7 +43,7 @@ export function loadAssets(renderer, onProgress, { normals = true } = {}) {
   const prep = (t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = Math.min(8, maxAniso); return t; };
 
   for (const id of MODELS) {
-    jobs.push(either(gltf, `/models/${id}.ktx2.glb`, `/models/${id}.glb`).then((g) => {
+    jobs.push(either(gltf, asset(`/models/${id}.ktx2.glb`), asset(`/models/${id}.glb`)).then((g) => {
       g.scene.traverse((o) => {
         if (o.isMesh) {
           o.castShadow = true; o.receiveShadow = true;
@@ -69,8 +70,8 @@ export function loadAssets(renderer, onProgress, { normals = true } = {}) {
     // colour and roughness/metal/AO as KTX2 (WebP fallback); normal maps stay WebP: as UASTC
     // KTX2 they were 9× the download (4.4 MB vs 0.5 MB) and the bake does not need them
     for (const map of normals || LIVE_NORMALS.includes(id) ? ["Diffuse", "nor_gl", "arm"] : ["Diffuse", "arm"]) {
-      const load = map === "nor_gl" ? tex.loadAsync(`/textures/${id}_${map}.webp`)
-        : ktx2.loadAsync(`/textures/${id}_${map}.ktx2`).catch(() => tex.loadAsync(`/textures/${id}_${map}.webp`));
+      const load = map === "nor_gl" ? tex.loadAsync(asset(`/textures/${id}_${map}.webp`))
+        : ktx2.loadAsync(asset(`/textures/${id}_${map}.ktx2`)).catch(() => tex.loadAsync(asset(`/textures/${id}_${map}.webp`)));
       jobs.push(load.then((t) => {
         prep(t);
         if (map === "Diffuse") t.colorSpace = THREE.SRGBColorSpace;
@@ -106,7 +107,7 @@ export function loadAssets(renderer, onProgress, { normals = true } = {}) {
     loadNormals() {
       const loader = new THREE.TextureLoader();
       const want = [...new Set(made.filter(([m]) => !m.normalMap).map(([, id]) => id))];
-      return Promise.all(want.map((id) => loader.loadAsync(`/textures/${id}_nor_gl.webp`).then((t) => { textures[id].nor_gl = prep(t); })))
+      return Promise.all(want.map((id) => loader.loadAsync(asset(`/textures/${id}_nor_gl.webp`)).then((t) => { textures[id].nor_gl = prep(t); })))
         .then(() => {
           for (const [m, id, rx, ry] of made) {
             if (m.normalMap || !textures[id].nor_gl) continue;

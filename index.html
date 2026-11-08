@@ -18,8 +18,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- fonts load without holding up the first paint (text shows in the fallback, then swaps) -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@500..800&family=Instrument+Sans:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500..800&family=Instrument+Sans:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&amp;family=Geist+Mono:wght@400..600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&amp;family=Geist+Mono:wght@400..600&amp;display=swap" /></noscript>
   <script>
     document.documentElement.classList.add("js");
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("rm");
@@ -156,81 +156,344 @@
 
     <!-- ================= THE READABLE VERSION ================= -->
     <div class="plain" id="read">
-      <section class="block" aria-labelledby="svc-title">
+      <!-- Marquee: two bands sliding opposite ways, leaning with the speed of the scroll -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>Websites <i>✺</i> Automation <i>✺</i> AI assistants <i>✺</i> Google &amp; Meta Ads <i>✺</i>&nbsp;</span>
+          <span>Websites <i>✺</i> Automation <i>✺</i> AI assistants <i>✺</i> Google &amp; Meta Ads <i>✺</i>&nbsp;</span>
+        </div>
+        <div class="marquee__track marquee__track--back">
+          <span>Built to sell <i>◆</i> Built to book <i>◆</i> Built to run itself <i>◆</i>&nbsp;</span>
+          <span>Built to sell <i>◆</i> Built to book <i>◆</i> Built to run itself <i>◆</i>&nbsp;</span>
+        </div>
+      </div>
+
+      <section class="block block--svc" aria-labelledby="svc-title">
         <div class="wrap">
-          <header class="block__head">
-            <p class="kicker">What we do</p>
-            <h2 class="block__title" id="svc-title">Four things, built by one team.</h2>
+          <header class="block__head block__head--split">
+            <p class="kicker"><b>01</b> What we do</p>
+            <h2 class="block__title" id="svc-title">Four things, built by <em>one team.</em></h2>
+            <p class="block__lede">Pick one or all four. They're built to work together, so a lead from an ad lands on a fast page, gets an instant reply, and shows up in your CRM without anyone copying it over.</p>
           </header>
-          <div class="svc-grid">
-            <article class="svc" id="svc-websites">
+          <div class="svc-list">
+            <article class="svc" id="svc-websites" tabindex="0" data-i="0">
               <span class="svc__n">01</span>
               <h3>Websites</h3>
-              <p>We design and build sites that explain what you sell in plain words and make it simple to buy, book or call. They load quickly on phones and are built to show up in search.</p>
-              <ul><li>Design and development</li><li>Online stores</li><li>Landing pages for campaigns</li><li>Search optimisation</li></ul>
+              <div class="svc__more"><div>
+                <p>We design and build sites that explain what you sell in plain words and make it simple to buy, book or call. They load quickly on phones and are built to show up in search.</p>
+                <ul><li>Design and development</li><li>Online stores</li><li>Landing pages for campaigns</li><li>Search optimisation</li></ul>
+              </div></div>
+              <span class="svc__arrow" aria-hidden="true">↗</span>
             </article>
-            <article class="svc" id="svc-automation">
+            <article class="svc" id="svc-automation" tabindex="0" data-i="1">
               <span class="svc__n">02</span>
               <h3>Automation</h3>
-              <p>We connect the tools you already use so leads, orders, invoices and reminders move on their own. Your team spends its time on customers instead of spreadsheets.</p>
-              <ul><li>CRM setup</li><li>WhatsApp and email follow-ups</li><li>Bookings and payments</li><li>Reports that update themselves</li></ul>
+              <div class="svc__more"><div>
+                <p>We connect the tools you already use so leads, orders, invoices and reminders move on their own. Your team spends its time on customers instead of spreadsheets.</p>
+                <ul><li>CRM setup</li><li>WhatsApp and email follow-ups</li><li>Bookings and payments</li><li>Reports that update themselves</li></ul>
+              </div></div>
+              <span class="svc__arrow" aria-hidden="true">↗</span>
             </article>
-            <article class="svc" id="svc-assistants">
+            <article class="svc" id="svc-assistants" tabindex="0" data-i="2">
               <span class="svc__n">03</span>
               <h3>AI assistants</h3>
-              <p>Assistants that answer common questions, book appointments and sort incoming documents, using only your information. Anything they can't handle goes straight to the right person.</p>
-              <ul><li>Website and WhatsApp chat</li><li>Appointment booking</li><li>Document sorting</li><li>Search across your own files</li></ul>
+              <div class="svc__more"><div>
+                <p>Assistants that answer common questions, book appointments and sort incoming documents, using only your information. Anything they can't handle goes straight to the right person.</p>
+                <ul><li>Website and WhatsApp chat</li><li>Appointment booking</li><li>Document sorting</li><li>Search across your own files</li></ul>
+              </div></div>
+              <span class="svc__arrow" aria-hidden="true">↗</span>
             </article>
-            <article class="svc" id="svc-ads">
+            <article class="svc" id="svc-ads" tabindex="0" data-i="3">
               <span class="svc__n">04</span>
               <h3>Google &amp; Meta Ads</h3>
-              <p>We plan, make and run campaigns on Google, Instagram and Facebook. Every week we test new versions, keep what brings customers at a sensible cost, and stop the rest.</p>
-              <ul><li>Search and Shopping ads</li><li>Instagram and Facebook ads</li><li>Ad creative</li><li>Tracking and weekly reports</li></ul>
+              <div class="svc__more"><div>
+                <p>We plan, make and run campaigns on Google, Instagram and Facebook. Every week we test new versions, keep what brings customers at a sensible cost, and stop the rest.</p>
+                <ul><li>Search and Shopping ads</li><li>Instagram and Facebook ads</li><li>Ad creative</li><li>Tracking and weekly reports</li></ul>
+              </div></div>
+              <span class="svc__arrow" aria-hidden="true">↗</span>
             </article>
+          </div>
+          <!-- desktop: a little picture of each service follows the pointer over its row -->
+          <div class="svc-float" aria-hidden="true">
+            <div class="svc-float__pane" style="--c:#ff3d1f">
+              <div class="ui-browser"><p class="ui-browser__bar"><i></i><i></i><i></i><span>yourbrand.com</span></p>
+                <div class="ui-browser__body"><p class="ui-browser__h">Book in three taps.</p><p class="ui-browser__p">Loads in 0.9 s on a phone.</p><p class="ui-browser__btn">Book now</p></div></div>
+            </div>
+            <div class="svc-float__pane" style="--c:#6ea8ff">
+              <div class="ui-flow"><p><b>New lead</b> Meta form</p><i></i><p><b>CRM</b> saved + tagged</p><i></i><p><b>WhatsApp</b> reply in 4 s</p><i></i><p class="is-on"><b>Booked</b> Tue 11:00</p></div>
+            </div>
+            <div class="svc-float__pane" style="--c:#3ad6b4">
+              <div class="ui-chat"><p class="ui-chat__in">Are you open Sunday?</p><p class="ui-chat__out">10 to 4. Want a slot?</p><p class="ui-chat__in">2 pm please</p><p class="ui-chat__out">Done ✓</p></div>
+            </div>
+            <div class="svc-float__pane" style="--c:#ffb547">
+              <div class="ui-dash"><p class="ui-dash__k">Cost per customer <span>this week</span></p><div class="ui-bars"><i style="--h:.95"></i><i style="--h:.8"></i><i style="--h:.71"></i><i style="--h:.55"></i><i style="--h:.48"></i><i style="--h:.4"></i></div><p class="ui-dash__row"><span>vs. last month</span><b>−54%</b></p></div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="block" id="work" aria-labelledby="work-title">
-        <div class="wrap">
-          <header class="block__head">
-            <p class="kicker">Work</p>
-            <h2 class="block__title" id="work-title">Recent projects.</h2>
+      <!-- Work: six example projects. Desktop: a fly-through, each project floating in depth over a
+           glowing grid; scrolling travels through them. Elsewhere: a plain list of cards. -->
+      <section class="block block--deck" id="work" aria-labelledby="work-title">
+        <div class="deck">
+          <header class="wrap deck__head">
+            <p class="kicker"><b>02</b> Selected work</p>
+            <h2 class="block__title" id="work-title">Things we <em>shipped.</em></h2>
           </header>
-          <ul class="work">
-            <li class="work__row" data-placeholder><span class="work__name">Dental clinic group</span><span class="work__what">Website, booking automation, Google Ads</span><span class="work__year">2025</span></li>
-            <li class="work__row" data-placeholder><span class="work__name">Skincare brand</span><span class="work__what">Online store, Instagram and Facebook ads</span><span class="work__year">2025</span></li>
-            <li class="work__row" data-placeholder><span class="work__name">Real estate developer</span><span class="work__what">Landing pages, Google Ads, lead follow-up</span><span class="work__year">2024</span></li>
-            <li class="work__row" data-placeholder><span class="work__name">Logistics company</span><span class="work__what">Internal tools, reporting automation</span><span class="work__year">2024</span></li>
+          <div class="deck__stage" aria-hidden="false">
+            <div class="corridor" aria-hidden="true"></div>
+            <ol class="deck__cards">
+              <li class="dcard" style="--c:#3ad6b4" data-i="0" data-for="For a dental clinic group, Pune" data-placeholder>
+                <button class="dcard__hit" type="button" aria-label="Open the Brightsmile Dental project"></button>
+                <div class="dcard__art case__art">
+                  <div class="ui-phone">
+                    <p class="ui-phone__brand">Brightsmile</p>
+                    <p class="ui-phone__h">Book a check-up in three taps.</p>
+                    <div class="ui-slots"><i>9:30</i><i class="is-on">11:00</i><i>14:15</i><i>16:40</i></div>
+                    <p class="ui-phone__btn">Book 11:00 →</p>
+                  </div>
+                  <span class="case__stamp">+212%<small>online bookings</small></span>
+                </div>
+                <div class="dcard__meta">
+                  <h3 class="dcard__name">Brightsmile Dental</h3>
+                  <p class="dcard__what">Website, online booking, Google Ads</p>
+                  <span class="dcard__year">2026</span>
+                </div>
+                <div class="dcard__story" hidden>
+                  <dl>
+                    <div><dt>The problem</dt><dd>Patients rang all day to book, and half the calls came while the front desk was with someone.</dd></div>
+                    <div><dt>What we did</dt><dd>A fast site that answers the usual questions, online booking tied to the clinic calendar, reminders on WhatsApp, and Google Ads for “dentist near me” in three neighbourhoods.</dd></div>
+                    <div><dt>What happened</dt><dd>Online bookings up 212% in four months; missed appointments down by a third.</dd></div>
+                  </dl>
+                </div>
+              </li>
+              <li class="dcard" style="--c:#ffb547" data-i="1" data-for="For a neighbourhood café, Bengaluru" data-placeholder>
+                <button class="dcard__hit" type="button" aria-label="Open the Café Lumen project"></button>
+                <div class="dcard__art case__art">
+                  <p class="art-word">Lumen</p>
+                  <div class="ui-ticket">
+                    <p><b>Order #2041</b><span>ready 08:12</span></p>
+                    <p>Flat white<span>×2</span></p>
+                    <p>Almond croissant<span>×1</span></p>
+                    <p class="ui-ticket__paid">Paid · picked up</p>
+                  </div>
+                  <span class="case__stamp">3.1×<small>return on ad spend</small></span>
+                </div>
+                <div class="dcard__meta">
+                  <h3 class="dcard__name">Café Lumen</h3>
+                  <p class="dcard__what">Ordering site, Instagram ads</p>
+                  <span class="dcard__year">2026</span>
+                </div>
+                <div class="dcard__story" hidden>
+                  <dl>
+                    <div><dt>The problem</dt><dd>A busy café with long morning queues and an Instagram that looked great but sold nothing.</dd></div>
+                    <div><dt>What we did</dt><dd>Order-ahead pages that work in two taps, and Instagram ads that show the morning menu to people within 2 km, only before 10 am.</dd></div>
+                    <div><dt>What happened</dt><dd>3.1× return on ad spend; one in five morning orders now placed ahead.</dd></div>
+                  </dl>
+                </div>
+              </li>
+              <li class="dcard" style="--c:#9ad46b" data-i="2" data-for="For a residential developer, Mumbai" data-placeholder>
+                <button class="dcard__hit" type="button" aria-label="Open the Oakfield Homes project"></button>
+                <div class="dcard__art case__art">
+                  <div class="ui-browser">
+                    <p class="ui-browser__bar"><i></i><i></i><i></i><span>oakfieldhomes.in/visit</span></p>
+                    <div class="ui-browser__body">
+                      <p class="ui-browser__h">2 &amp; 3-bed homes, 6 minutes from the metro.</p>
+                      <p class="ui-browser__p">Show flat open this Saturday.</p>
+                      <p class="ui-browser__btn">Book a visit</p>
+                    </div>
+                  </div>
+                  <span class="case__stamp">640<small>qualified leads in 90 days</small></span>
+                </div>
+                <div class="dcard__meta">
+                  <h3 class="dcard__name">Oakfield Homes</h3>
+                  <p class="dcard__what">Landing pages, Meta lead ads, CRM automation</p>
+                  <span class="dcard__year">2025</span>
+                </div>
+                <div class="dcard__story" hidden>
+                  <dl>
+                    <div><dt>The problem</dt><dd>Leads from portals arrived late, in five inboxes, and most were never called back.</dd></div>
+                    <div><dt>What we did</dt><dd>One landing page per project, Meta lead ads, and an automation that saves every lead to the CRM and sends a WhatsApp reply within a minute.</dd></div>
+                    <div><dt>What happened</dt><dd>640 qualified leads in 90 days, every one answered in under a minute.</dd></div>
+                  </dl>
+                </div>
+              </li>
+              <li class="dcard" style="--c:#ff8fb1" data-i="3" data-for="For an independent skincare brand" data-placeholder>
+                <button class="dcard__hit" type="button" aria-label="Open the Nimbus Skincare project"></button>
+                <div class="dcard__art case__art">
+                  <div class="ui-shop">
+                    <div><i></i><p>Cloud serum</p><b>₹1,450</b></div>
+                    <div><i></i><p>Dew cream</p><b>₹990</b></div>
+                    <div><i></i><p>Night oil</p><b>₹1,200</b></div>
+                  </div>
+                  <span class="case__stamp">+86%<small>conversion rate</small></span>
+                </div>
+                <div class="dcard__meta">
+                  <h3 class="dcard__name">Nimbus Skincare</h3>
+                  <p class="dcard__what">Online store, product ads, email flows</p>
+                  <span class="dcard__year">2025</span>
+                </div>
+                <div class="dcard__story" hidden>
+                  <dl>
+                    <div><dt>The problem</dt><dd>A loved skincare line selling through DMs, with no store and no idea which ads worked.</dd></div>
+                    <div><dt>What we did</dt><dd>An online store with fast product pages, abandoned-cart emails, and product ads tracked to the sale.</dd></div>
+                    <div><dt>What happened</dt><dd>Conversion rate up 86%; repeat orders up 40% from email alone.</dd></div>
+                  </dl>
+                </div>
+              </li>
+              <li class="dcard" style="--c:#6ea8ff" data-i="4" data-for="For a regional logistics company" data-placeholder>
+                <button class="dcard__hit" type="button" aria-label="Open the Northline Logistics project"></button>
+                <div class="dcard__art case__art">
+                  <div class="ui-dash">
+                    <p class="ui-dash__k">Deliveries this week <span>auto-updated 06:00</span></p>
+                    <div class="ui-bars"><i style="--h:.42"></i><i style="--h:.58"></i><i style="--h:.51"></i><i style="--h:.73"></i><i style="--h:.66"></i><i style="--h:.88"></i><i style="--h:.95"></i></div>
+                    <p class="ui-dash__row"><span>On time</span><b>97.4%</b></p>
+                  </div>
+                  <span class="case__stamp">22 h<small>saved every week</small></span>
+                </div>
+                <div class="dcard__meta">
+                  <h3 class="dcard__name">Northline Logistics</h3>
+                  <p class="dcard__what">Internal tools, reporting automation</p>
+                  <span class="dcard__year">2024</span>
+                </div>
+                <div class="dcard__story" hidden>
+                  <dl>
+                    <div><dt>The problem</dt><dd>Every Monday, two people spent the day building the weekly delivery report by hand.</dd></div>
+                    <div><dt>What we did</dt><dd>Internal tools that pull from the dispatch system and a report that updates itself at 6 am.</dd></div>
+                    <div><dt>What happened</dt><dd>22 hours of manual work saved every week; on-time rate visible to all.</dd></div>
+                  </dl>
+                </div>
+              </li>
+              <li class="dcard" style="--c:#ff6a3d" data-i="5" data-for="For a boutique fitness studio" data-placeholder>
+                <button class="dcard__hit" type="button" aria-label="Open the Studio Nine Fitness project"></button>
+                <div class="dcard__art case__art">
+                  <div class="ui-chat">
+                    <p class="ui-chat__in">Any spin classes left tonight?</p>
+                    <p class="ui-chat__out">Two spots at 7:30 pm with Ana. Want one?</p>
+                    <p class="ui-chat__in">Yes please!</p>
+                    <p class="ui-chat__out">Booked ✓ See you at 7:30.</p>
+                  </div>
+                  <span class="case__stamp">1,900<small>chats answered a month</small></span>
+                </div>
+                <div class="dcard__meta">
+                  <h3 class="dcard__name">Studio Nine Fitness</h3>
+                  <p class="dcard__what">WhatsApp assistant, class booking</p>
+                  <span class="dcard__year">2024</span>
+                </div>
+                <div class="dcard__story" hidden>
+                  <dl>
+                    <div><dt>The problem</dt><dd>The front desk answered the same class and price questions hundreds of times a week.</dd></div>
+                    <div><dt>What we did</dt><dd>A WhatsApp assistant that knows the timetable and prices, books classes, and hands anything unusual to a person.</dd></div>
+                    <div><dt>What happened</dt><dd>1,900 chats answered a month; class fill rate up 18%.</dd></div>
+                  </dl>
+                </div>
+              </li>
+            </ol>
+          </div>
+          <div class="deck__hud">
+            <p class="deck__count"><b>01</b> / 06</p>
+            <p class="deck__name">Brightsmile Dental</p>
+            <p class="deck__meta"><i></i><span>Website, online booking, Google Ads · 2026</span></p>
+            <p class="deck__hint">Scroll to walk the corridor · click a project to open it</p>
+          </div>
+          <div class="corridor__pill" aria-hidden="true"><i></i><span></span></div>
+          <aside class="corridor__info" aria-labelledby="cinfo-title" hidden>
+            <button class="corridor__x" type="button" aria-label="Close the project">✕</button>
+            <p class="corridor__k"><i></i><span></span></p>
+            <h3 class="corridor__title" id="cinfo-title"></h3>
+            <p class="corridor__for"></p>
+            <p class="corridor__p"></p>
+            <dl class="corridor__spec"></dl>
+            <div class="corridor__foot">
+              <button class="corridor__view" type="button">Read the case study <span aria-hidden="true">→</span></button>
+              <button class="corridor__next" type="button"><small>Next project</small><span></span></button>
+            </div>
+          </aside>
+          <nav class="deck__ticks" aria-label="Projects">
+            <ol>
+              <li><button type="button" data-i="0"><span>Brightsmile Dental</span></button></li>
+              <li><button type="button" data-i="1"><span>Café Lumen</span></button></li>
+              <li><button type="button" data-i="2"><span>Oakfield Homes</span></button></li>
+              <li><button type="button" data-i="3"><span>Nimbus Skincare</span></button></li>
+              <li><button type="button" data-i="4"><span>Northline Logistics</span></button></li>
+              <li><button type="button" data-i="5"><span>Studio Nine Fitness</span></button></li>
+            </ol>
+          </nav>
+        </div>
+      </section>
+
+      <!-- Case study, filled from the project clicked -->
+      <div class="caseview" role="dialog" aria-modal="true" aria-labelledby="caseview-title" hidden>
+        <button class="caseview__close" type="button">Close <span aria-hidden="true">✕</span></button>
+        <div class="caseview__inner">
+          <p class="caseview__k"></p>
+          <h2 class="caseview__title" id="caseview-title"></h2>
+          <div class="caseview__art"></div>
+          <div class="caseview__story"></div>
+          <a class="btn btn--red caseview__cta" href="#contact">Start a project like this</a>
+        </div>
+      </div>
+
+      <!-- Numbers -->
+      <section class="block block--stats" aria-label="In numbers">
+        <div class="wrap">
+          <ul class="stats" data-placeholder>
+            <li><b data-count="48">48</b><span>projects shipped</span></li>
+            <li><b data-count="3.4" data-decimals="1" data-suffix="×">3.4<small>×</small></b><span>average return on ad spend</span></li>
+            <li><b data-count="11" data-suffix=" s">11<small>s</small></b><span>average assistant reply</span></li>
+            <li><b data-count="100" data-suffix="%">100<small>%</small></b><span>of accounts in your name</span></li>
           </ul>
         </div>
       </section>
 
-      <section class="block" id="process" aria-labelledby="process-title">
-        <div class="wrap">
-          <header class="block__head">
-            <p class="kicker">How a project runs</p>
-            <h2 class="block__title" id="process-title">Four steps, no surprises.</h2>
+      <section class="block block--process" id="process" aria-labelledby="process-title">
+        <div class="wrap process">
+          <header class="block__head process__head">
+            <p class="kicker"><b>03</b> How a project runs</p>
+            <h2 class="block__title" id="process-title">Four steps, <em>no surprises.</em></h2>
+            <div class="process__line" aria-hidden="true"><i></i></div>
           </header>
           <ol class="steps">
-            <li><span>1</span><h3>Call</h3><p>Thirty minutes on your business, your customers and what is not working today.</p></li>
-            <li><span>2</span><h3>Plan</h3><p>A written plan with scope, timeline and a fixed price. You decide before any work starts.</p></li>
-            <li><span>3</span><h3>Build</h3><p>We design, build and test. You see progress every week and can comment at any time.</p></li>
-            <li><span>4</span><h3>Improve</h3><p>After launch we measure what happens and keep improving the parts that matter most.</p></li>
+            <li><span>01</span><h3>Call</h3><p>Thirty minutes on your business, your customers and what is not working today.</p></li>
+            <li><span>02</span><h3>Plan</h3><p>A written plan with scope, timeline and a fixed price. You decide before any work starts.</p></li>
+            <li><span>03</span><h3>Build</h3><p>We design, build and test. You see progress every week and can comment at any time.</p></li>
+            <li><span>04</span><h3>Improve</h3><p>After launch we measure what happens and keep improving the parts that matter most.</p></li>
           </ol>
         </div>
       </section>
 
-      <section class="block" aria-labelledby="promise-title">
+      <!-- What clients say (example quotes) -->
+      <section class="block block--quotes" aria-labelledby="quotes-title">
+        <div class="wrap">
+          <p class="kicker" id="quotes-title"><b>04</b> What clients say</p>
+          <div class="quotes" data-placeholder>
+            <figure class="quote is-on">
+              <blockquote>“Our phones used to ring all day with the same five questions. Now the assistant answers them and the chair is booked before we open.”</blockquote>
+              <figcaption><b>Dr. Priya Shah</b> · Brightsmile Dental</figcaption>
+            </figure>
+            <figure class="quote">
+              <blockquote>“They cut half our ads in the first month and sales went up. Every Monday we get one page that says exactly what each customer cost.”</blockquote>
+              <figcaption><b>Rohan Mehta</b> · Café Lumen</figcaption>
+            </figure>
+            <figure class="quote">
+              <blockquote>“Leads from Meta land in our CRM with a WhatsApp reply already sent. Our sales team stopped copying spreadsheets.”</blockquote>
+              <figcaption><b>Anita Fernandes</b> · Oakfield Homes</figcaption>
+            </figure>
+            <div class="quotes__dots" role="tablist" aria-label="Quotes"><button type="button" aria-label="Quote 1" class="is-on"></button><button type="button" aria-label="Quote 2"></button><button type="button" aria-label="Quote 3"></button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block block--promise" aria-labelledby="promise-title">
         <div class="wrap">
           <header class="block__head">
-            <p class="kicker">What you can expect</p>
-            <h2 class="block__title" id="promise-title">Three promises.</h2>
+            <p class="kicker"><b>05</b> What you can expect</p>
+            <h2 class="block__title" id="promise-title">Three <em>promises.</em></h2>
           </header>
           <dl class="promises">
-            <div><dt>One team</dt><dd>Design, development, automation and ads under one roof, so nothing gets lost between agencies.</dd></div>
-            <div><dt>Plain reports</dt><dd>We report on enquiries, sales and what each customer cost. Not on impressions.</dd></div>
-            <div><dt>You own it</dt><dd>Code, ad accounts, tools and data are set up in your name from day one.</dd></div>
+            <div><span class="promises__n">01</span><dt>One team</dt><dd>Design, development, automation and ads under one roof, so nothing gets lost between agencies.</dd></div>
+            <div><span class="promises__n">02</span><dt>Plain reports</dt><dd>We report on enquiries, sales and what each customer cost. Not on impressions.</dd></div>
+            <div><span class="promises__n">03</span><dt>You own it</dt><dd>Code, ad accounts, tools and data are set up in your name from day one.</dd></div>
           </dl>
         </div>
       </section>
@@ -238,10 +501,10 @@
       <section class="block block--contact" id="contact" aria-labelledby="contact-title">
         <div class="wrap contact">
           <div class="contact__copy">
-            <p class="kicker">Contact</p>
-            <h2 class="contact__title" id="contact-title">Let's talk.</h2>
-            <p class="contact__p">Tell us what you need. We reply to every message ourselves.</p>
-            <a class="contact__mail" href="mailto:hello@scyne.studio">hello@scyne.studio</a>
+            <p class="kicker"><b>06</b> Contact</p>
+            <h2 class="contact__title" id="contact-title" aria-label="Let's talk.">Let's talk.</h2>
+            <p class="contact__p">Tell us what you need. We reply to every message ourselves, usually the same day.</p>
+            <a class="contact__mail" href="mailto:hello@scyne.studio">hello@scyne.studio <span aria-hidden="true">↗</span></a>
           </div>
           <form class="form" id="contact-form" novalidate data-endpoint="">
             <div class="form__row">
@@ -268,7 +531,7 @@
 
       <footer class="footer">
         <div class="wrap footer__inner">
-          <p class="footer__big" aria-hidden="true">Scyne</p>
+          <p class="footer__big" aria-hidden="true"><span>Scyne</span><span class="footer__fill">Scyne</span></p>
           <div class="footer__row">
             <span>© <span data-year>2026</span> Scyne Studio</span>
             <a href="mailto:hello@scyne.studio">hello@scyne.studio</a>

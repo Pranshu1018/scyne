@@ -1,6 +1,6 @@
 /* The studio: renderer, lighting, post-processing, camera tour and interaction.
 
-   "Real" view: PBR materials, soft shadows, area lights, ambient occlusion, subtle bloom and grain.
+   "Real" view: PBR materials, baked light, subtle bloom, a light grade, vignette and grain.
    "Machine" view (basement.studio's Human/Machine idea): white edges and 1-bit ordered dithering.
 
    Scroll progress (0 → 1) moves the camera down the stairs and through six stops. */
@@ -40,20 +40,30 @@ const STOPS = [
   { id: "contact",    pos: [3.6, 1.65, 3.2],   look: [7.0, 1.8, 3.75],   shift: 0.42 },
 ];
 
-const GrainShader = {
-  // Fine, low-amplitude sensor texture: the former 4.5% noise and heavy vignette softened
-  // every edge and made the whole room look like a compressed game capture.
-  uniforms: { tDiffuse: { value: null }, time: { value: 0 }, amount: { value: 0.006 } },
-  vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
-  fragmentShader: `
-    uniform sampler2D tDiffuse; uniform float time; uniform float amount; varying vec2 vUv;
-    float rand(vec2 co){ return fract(sin(dot(co, vec2(12.9898,78.233))) * 43758.5453); }
-    void main(){
-      vec4 c = texture2D(tDiffuse, vUv);
-      c.rgb += (rand(vUv * vec2(1920.0, 1080.0) + time) - 0.5) * amount;
-      gl_FragColor = c;
-    }`,
-};
+/* The finish, added inside the output pass (after tone mapping and the colour space) rather than
+   as passes of their own, so it costs no extra full-screen draw:
+   - a gentle grade: a little more colour and contrast, as a film print would have
+   - a soft vignette, so the eye settles on the middle of the frame
+   - fine, low-amplitude sensor grain (it also dithers away banding in the dark gradients)
+   finish = 0 turns grade and vignette off (the "Machine" view dithers the image itself). */
+function addFinish(output) {
+  output.uniforms.grainTime = { value: 0 };
+  output.uniforms.grainAmount = { value: 0.006 };
+  output.uniforms.finish = { value: 1 };
+  const fs = output.material.fragmentShader;
+  const end = fs.lastIndexOf("}");
+  output.material.fragmentShader = fs.slice(0, fs.indexOf("void main")) +
+    "uniform float grainTime;\nuniform float grainAmount;\nuniform float finish;\n" +
+    "float grainRand(vec2 co) { return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453); }\n" +
+    fs.slice(fs.indexOf("void main"), end) +
+    "  vec3 c = gl_FragColor.rgb;\n" +
+    "  c = mix(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), c, 1.0 + 0.06 * finish);\n" +
+    "  c = clamp((c - 0.5) * (1.0 + 0.07 * finish) + 0.5 - 0.004 * finish, 0.0, 1.0);\n" +
+    "  vec2 q = vUv - 0.5;\n" +
+    "  c *= 1.0 - 0.18 * finish * smoothstep(0.25, 0.85, dot(q, q) * 2.2);\n" +
+    "  gl_FragColor.rgb = c + (grainRand(vUv * vec2(1920.0, 1080.0) + grainTime) - 0.5) * grainAmount;\n}\n";
+  return { uniforms: output.uniforms };
+}
 
 /* 1-bit ordered dithering, pixelated: white (or red, where the scene is red) on black */
 const DitherShader = {
@@ -157,8 +167,8 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
     outline.enabled = false; // only runs while something is hovered
     composer.addPass(outline);
   }
-  composer.addPass(new OutputPass());
-  const grain = new ShaderPass(GrainShader); composer.addPass(grain);
+  const output = new OutputPass(); composer.addPass(output);
+  const finish = addFinish(output);
   const dither = new ShaderPass(DitherShader); dither.enabled = false; composer.addPass(dither);
 
   function resize() {
@@ -392,7 +402,8 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
     if (on && !edgesBuilt) buildEdges();
     scene.traverse((o) => { if (o.userData.edge) o.visible = on; });
     dither.enabled = on;
-    grain.enabled = !on;
+    finish.uniforms.grainAmount.value = on ? 0 : 0.006;
+    finish.uniforms.finish.value = on ? 0 : 1;
     if (gtao) gtao.enabled = !on && TIERS[tier].ao && !bakedLighting;
     bloom.strength = on ? 0.2 : TIERS[tier].bloom;
   }
@@ -447,7 +458,7 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
       const inView = frustum.intersectsObject(st.proxy) && camera.position.distanceTo(st.center) < 11;
       if (inView || (frameNo + st.idx * 6) % 30 === 0) { st.update(t, st.skip, state); st.skip = 0; }
     }
-    grain.uniforms.time.value = t;
+    finish.uniforms.grainTime.value = t;
     const tr = !firstFrame && performance.now();
     composer.render();
     if (tr) { mark(`first frame took ${Math.round(performance.now() - tr)} ms,`); performance.mark("scyne:first-frame"); }

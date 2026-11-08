@@ -2,7 +2,8 @@
 
    mergeStatic(root): everything under `root` that never moves is baked into one mesh per
    material. Hundreds of draw calls (beams, steps, rollers, every copy of a cardboard box…)
-   become a few dozen. Anything inside a subtree flagged `userData.dynamic` is left alone. */
+   become a few dozen. Anything inside a subtree flagged `userData.dynamic`, and any mesh flagged
+   `userData.live` (lit in real time, outside the bake), is left alone. */
 
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
@@ -38,7 +39,7 @@ export function mergeStatic(root) {
   root.traverse((o) => {
     if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || o.children.length) return;
     const m = o.material;
-    if (!m || Array.isArray(m) || m.transparent || m.userData.screen || isDynamic(o, root)) return;
+    if (!m || Array.isArray(m) || m.transparent || m.userData.screen || o.userData.live || isDynamic(o, root)) return;
     const g = o.geometry;
     const key = [m.uuid, Object.keys(g.attributes).sort().join(","), g.index ? "i" : "n", o.castShadow, o.receiveShadow, local.multiplyMatrices(inv, o.matrixWorld).determinant() < 0].join("|");
     let b = buckets.get(key);

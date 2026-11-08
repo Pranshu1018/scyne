@@ -10,6 +10,7 @@ import { box, display, Screen, rr, FONT, MONO, ease } from "../kit.js";
 import { oakTable } from "./web.js";
 import { officeChair } from "../chair.js";
 import { laptop, plate, phone, mug, notebook } from "../devices.js";
+import { prepareMan } from "../man.js";
 
 // ---------- Wall board: today's work, moving by itself ----------
 const COLS = ["New enquiry", "Saved to CRM", "Replied", "Booked", "Invoiced"];
@@ -171,18 +172,17 @@ export function buildAutomation(A) {
   sitter.add(chair.upper);
   const man = A.models.man;
   man.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = true; o.receiveShadow = true; } });
-  man.updateMatrixWorld(true);
   sitter.add(man);
-  tilt.userData.dynamic = true; // he breathes, so his mesh stays out of the static merge
   g.add(tilt);
+  // sat in the chair (the sitter's space), elbows out, hands clasped behind his neck (see man.js)
+  const body = prepareMan(man);
+  tilt.userData.dynamic = true; // he breathes, so his mesh stays out of the static merge
 
   // a slow breath and a little drift of the head, rotating bones about his own axes
-  const bone = (n) => man.getObjectByName(n);
   const axisIn = (b, v) => { const q = new THREE.Quaternion(); b.parent.getWorldQuaternion(q); return v.clone().applyQuaternion(q.invert()).normalize(); };
   const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
-  const moving = [["Bip01_Spine1", X], ["Bip01_Spine2", X], ["Bip01_Head", Y], ["Bip01_Neck", X]].map(([n, v]) => {
-    const b = bone(n); return b && { b, base: b.quaternion.clone(), axis: axisIn(b, v) };
-  });
+  const moving = (body ? [[body.spine[0], X], [body.spine[1], X], [body.head, Y], [body.neck, X]] : []).map(([b, v]) =>
+    b && { b, base: b.quaternion.clone(), axis: axisIn(b, v) });
   const qTmp = new THREE.Quaternion();
   const turn = (m, a) => { if (m) m.b.quaternion.copy(m.base).premultiply(qTmp.setFromAxisAngle(m.axis, a)); };
 

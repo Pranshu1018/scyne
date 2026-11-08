@@ -100,6 +100,6 @@ export function rr(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
-export const FONT = '"Instrument Sans", "Helvetica Neue", Arial, sans-serif';
-export const MONO = '"JetBrains Mono", ui-monospace, Menlo, monospace';
+export const FONT = '"Geist", "Helvetica Neue", Arial, sans-serif';
+export const MONO = '"Geist Mono", ui-monospace, Menlo, monospace';
 export const ease = (x) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);

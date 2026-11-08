@@ -3,10 +3,11 @@
    leather notebook with a pen. */
 
 import * as THREE from "three";
-import { box, Screen } from "./kit.js";
+import { box, Screen, FONT } from "./kit.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
-const anodised = new THREE.MeshPhysicalMaterial({ color: "#5d6065", roughness: 0.34, metalness: 1, clearcoat: 0.1, clearcoatRoughness: 0.4 });
-const keyMat = new THREE.MeshStandardMaterial({ color: "#0f0f11", roughness: 0.62, metalness: 0 });
+// space grey aluminium, bead-blasted: half metal so it reads as grey, not as a black mirror
+const anodised = new THREE.MeshPhysicalMaterial({ color: "#73767c", roughness: 0.42, metalness: 0.55, clearcoat: 0.1, clearcoatRoughness: 0.4 });
 const glass = new THREE.MeshPhysicalMaterial({ color: "#040405", roughness: 0.04, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.02 });
 
 export function plate(w, d, t, r, mat) {
@@ -22,33 +23,154 @@ export function plate(w, d, t, r, mat) {
   return m;
 }
 
+/* ---------- Keyboard ----------
+   A full laptop layout in key units (1 u = 18.6 mm pitch): function row, numbers, three letter
+   rows, and the bottom row with the arrow cluster; every row spans 14.5 u. Each keycap is a
+   rounded, slightly bevelled block, and all of them are one mesh (one draw call) mapped from
+   above onto a drawn keyboard, so the legends are printed on the caps. The legends glow a
+   little, as a backlit keyboard does in a dim room. Built once, shared by every laptop. */
+const U = 0.0186, GAP = 0.0027, KB_W = 14.5 * U;
+const ROWS = [
+  { h: 0.62, keys: [["esc", 1.5], ...["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"].map((k) => [k, 1]), ["", 1]] },
+  { h: 1, keys: [..."`1234567890-=".split("").map((k) => [k, 1]), ["delete", 1.5]] },
+  { h: 1, keys: [["tab", 1.5], ..."QWERTYUIOP[]\\".split("").map((k) => [k, 1])] },
+  { h: 1, keys: [["caps lock", 1.8], ..."ASDFGHJKL;'".split("").map((k) => [k, 1]), ["return", 1.7]] },
+  { h: 1, keys: [["shift", 2.3], ..."ZXCVBNM,./".split("").map((k) => [k, 1]), ["shift", 2.2]] },
+  { h: 1, keys: [["fn", 1], ["control", 1], ["option", 1], ["⌘", 1.25], ["", 5], ["⌘", 1.25], ["option", 1], ["◀", 1], ["▲▼", 1], ["▶", 1]] },
+];
+const KB_D = ROWS.reduce((d, r) => d + r.h * U, 0);
+const SHIFTED = { "`": "~", 1: "!", 2: "@", 3: "#", 4: "$", 5: "%", 6: "^", 7: "&", 8: "*", 9: "(", 0: ")", "-": "_", "=": "+", "[": "{", "]": "}", "\\": "|", ";": ":", "'": "\"", ",": "<", ".": ">", "/": "?" };
+const ARROWS = "◀▶▲▼";
+
+/* every key as { label, x, z, w, d }, in metres from the keyboard's back-left corner. The up and
+   down arrows share one slot, half height each; left and right are half height, at the bottom. */
+function keyRects() {
+  const out = [];
+  let z = 0;
+  for (const row of ROWS) {
+    let x = 0;
+    for (const [label, w] of row.keys) {
+      const kw = w * U - GAP, kd = row.h * U - GAP, half = kd / 2 - GAP / 4;
+      const at = (l, dz, d) => out.push({ label: l, x: x + GAP / 2, z: z + GAP / 2 + dz, w: kw, d });
+      if (label === "▲▼") { at("▲", 0, half); at("▼", kd - half, half); }
+      else if (label === "◀" || label === "▶") at(label, kd - half, half);
+      else at(label, 0, kd);
+      x += w * U;
+    }
+    z += row.h * U;
+  }
+  return out;
+}
+
+/* the printed face of the keyboard: caps, legends, the dark well between them */
+function keyboardTexture(keys) {
+  const PX = 2048 / KB_W; // pixels per metre
+  const cv = document.createElement("canvas");
+  cv.width = 2048; cv.height = Math.ceil(KB_D * PX);
+  const c = cv.getContext("2d");
+  c.fillStyle = "#050506"; c.fillRect(0, 0, cv.width, cv.height);
+  c.textBaseline = "middle";
+  for (const k of keys) {
+    const x = k.x * PX, y = k.z * PX, w = k.w * PX, h = k.d * PX;
+    // the cap: near black, a touch lighter in the middle (the slight dish of its top)
+    const grad = c.createRadialGradient(x + w / 2, y + h / 2, 0, x + w / 2, y + h / 2, Math.max(w, h) * 0.7);
+    grad.addColorStop(0, "#1d1e21"); grad.addColorStop(1, "#141517");
+    c.fillStyle = grad;
+    c.beginPath(); c.roundRect(x, y, w, h, 0.0016 * PX); c.fill();
+    if (!k.label) continue;
+    c.fillStyle = "#c9cbcf";
+    const single = [...k.label].length === 1, arrow = ARROWS.includes(k.label);
+    const small = 0.0021 * PX, big = 0.0034 * PX;
+    if (single && SHIFTED[k.label]) { // two symbols, stacked
+      c.textAlign = "center"; c.font = `400 ${small * 1.15}px ${FONT}`;
+      c.fillText(SHIFTED[k.label], x + w / 2, y + h * 0.32);
+      c.fillText(k.label, x + w / 2, y + h * 0.7);
+    } else if (single || arrow || /^F\d/.test(k.label)) {
+      c.textAlign = "center"; c.font = `400 ${single && !arrow ? big : small}px ${FONT}`;
+      c.fillText(k.label, x + w / 2, y + h / 2);
+    } else { // modifiers: a small word in the corner
+      const right = k.x > KB_W / 2;
+      c.textAlign = right ? "right" : "left"; c.font = `400 ${small}px ${FONT}`;
+      c.fillText(k.label, right ? x + w - 0.0022 * PX : x + 0.0022 * PX, y + h - 0.0034 * PX);
+    }
+  }
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+
+/* one keycap, w × d, standing on y = 0 with its top at y = h: rounded corners, a small bevel */
+function keycap(w, d, h) {
+  const r = Math.min(0.0017, w / 2 - 1e-4, d / 2 - 1e-4), b = 0.00035;
+  const s = new THREE.Shape();
+  s.moveTo(-w / 2 + r, -d / 2); s.lineTo(w / 2 - r, -d / 2); s.absarc(w / 2 - r, -d / 2 + r, r, -Math.PI / 2, 0);
+  s.lineTo(w / 2, d / 2 - r); s.absarc(w / 2 - r, d / 2 - r, r, 0, Math.PI / 2);
+  s.lineTo(-w / 2 + r, d / 2); s.absarc(-w / 2 + r, d / 2 - r, r, Math.PI / 2, Math.PI);
+  s.lineTo(-w / 2, -d / 2 + r); s.absarc(-w / 2 + r, -d / 2 + r, r, Math.PI, Math.PI * 1.5);
+  const g = new THREE.ExtrudeGeometry(s, { depth: h - 2 * b, bevelEnabled: true, bevelThickness: b, bevelSize: b * 0.9, bevelOffset: -b * 0.9, bevelSegments: 2, curveSegments: 3 });
+  g.rotateX(-Math.PI / 2); // extrusion → +y (from -b), shape y → -z
+  g.translate(0, b, 0);
+  return g;
+}
+
+let keyboardShared = null;
+function keyboardParts() {
+  if (keyboardShared) return keyboardShared;
+  const keys = keyRects(), H = 0.0013; // caps stand 1.3 mm proud of the well
+  const geos = keys.map((k) => keycap(k.w, k.d, H).translate(k.x + k.w / 2 - KB_W / 2, 0, k.z + k.d / 2));
+  const geo = mergeGeometries(geos, false);
+  geos.forEach((g) => g.dispose());
+  // mapped from above: every cap shows its own patch of the drawn keyboard
+  const p = geo.attributes.position, uv = new Float32Array(p.count * 2);
+  for (let i = 0; i < p.count; i++) { uv[i * 2] = (p.getX(i) + KB_W / 2) / KB_W; uv[i * 2 + 1] = 1 - p.getZ(i) / KB_D; }
+  geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+  const face = keyboardTexture(keys);
+  const caps = new THREE.MeshStandardMaterial({ map: face, roughness: 0.48, metalness: 0, emissive: "#fff4e6", emissiveMap: face, emissiveIntensity: 0.14 });
+  const wellGeo = new THREE.PlaneGeometry(KB_W + 0.002, KB_D + 0.002);
+  wellGeo.rotateX(-Math.PI / 2); wellGeo.translate(0, 0.00005, KB_D / 2);
+  const well = new THREE.MeshStandardMaterial({ color: "#060607", roughness: 0.85 });
+  keyboardShared = { geo, caps, wellGeo, well };
+  return keyboardShared;
+}
+
+/* The keyboard, its back edge at z = 0, standing on y = 0. Lit live (small and glossy: it should
+   catch the light as the camera moves), so it is kept out of the bake and the static merge. */
+export function keyboard() {
+  const k = keyboardParts();
+  const g = new THREE.Group();
+  const well = new THREE.Mesh(k.wellGeo, k.well), caps = new THREE.Mesh(k.geo, k.caps);
+  well.userData.live = true; caps.userData.live = true;
+  caps.receiveShadow = true;
+  g.add(well, caps);
+  return g;
+}
+
+/* a strip of tiny speaker holes, 9 × 99 mm: dark dots, see-through between them */
+let grilleShared = null;
+function speakerGrille() {
+  if (grilleShared) return grilleShared;
+  const cv = document.createElement("canvas"); cv.width = 64; cv.height = 704;
+  const c = cv.getContext("2d");
+  c.fillStyle = "#fff";
+  for (let row = 0, y = 8; y < cv.height - 4; y += 9, row++) {
+    for (let x = 6 + (row % 2) * 4.5; x < cv.width - 4; x += 9) { c.beginPath(); c.arc(x, y, 2.1, 0, Math.PI * 2); c.fill(); }
+  }
+  const t = new THREE.CanvasTexture(cv); t.anisotropy = 8;
+  const mat = new THREE.MeshStandardMaterial({ color: "#0a0a0b", roughness: 0.9, alphaMap: t, alphaTest: 0.5 });
+  grilleShared = { geo: new THREE.PlaneGeometry(0.009, 0.099), mat };
+  return grilleShared;
+}
+
 export function laptop(draw, { fps = 8, scale = 1, light = 0, res = 0.8 } = {}) {
   const g = new THREE.Group();
   const W = 0.304, D = 0.215, T = 0.0115;
   g.add(plate(W, D, T, 0.011, anodised));
-  // keyboard: 6 rows of keys as one instanced mesh, set into the deck
-  const keyGeo = new THREE.BoxGeometry(1, 0.0012, 1);
-  const rows = [[14, 0.0118], [14, 0.0158], [14, 0.0158], [13, 0.0158], [12, 0.0158], [9, 0.0158]];
-  const total = rows.reduce((n, r) => n + r[0], 0);
-  const keys = new THREE.InstancedMesh(keyGeo, keyMat, total); keys.receiveShadow = true;
-  const mtx = new THREE.Matrix4(), pitch = 0.0186, kbW = 14 * pitch;
-  let k = 0, z = 0.0;
-  rows.forEach(([n, h], ri) => {
-    const space = ri === 5 ? pitch * 4.2 : 0; // the bottom row has a space bar
-    const outer = (kbW - n * pitch - space) / 2; // leftover width goes to the outer keys
-    let x = -kbW / 2;
-    for (let i = 0; i < n; i++) {
-      let kw = pitch - 0.0028;
-      if (space && i === 4) kw += space;
-      else if (i === 0 || i === n - 1) kw += outer;
-      mtx.compose(new THREE.Vector3(x + kw / 2, T + 0.0006, -0.088 + z + h / 2), new THREE.Quaternion(), new THREE.Vector3(kw, 1, h));
-      keys.setMatrixAt(k++, mtx);
-      x += kw + 0.0028;
-    }
-    z += h + 0.0028;
-  });
-  g.add(keys);
-  const pad = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.08), new THREE.MeshPhysicalMaterial({ color: "#55585d", roughness: 0.22, metalness: 0.9, clearcoat: 0.6 }));
+  // keyboard: sculpted keycaps with printed, softly backlit legends, in a dark well (see keyboard())
+  const kb = keyboard(); kb.position.set(0, T, -0.0905); g.add(kb);
+  // speaker grilles either side of the keys
+  const grille = speakerGrille();
+  for (const x of [-1, 1]) { const s = new THREE.Mesh(grille.geo, grille.mat); s.rotation.x = -Math.PI / 2; s.position.set(x * 0.1445, T + 0.00005, -0.039); s.userData.live = true; g.add(s); }
+  const pad = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.08), new THREE.MeshStandardMaterial({ color: "#5f6267", roughness: 0.36, metalness: 0.5 }));
   pad.rotation.x = -Math.PI / 2; pad.position.set(0, T + 0.0002, 0.058); g.add(pad);
   // lid on its hinge at the back edge; the screen faces the user (+z)
   const hinge = new THREE.Group(); hinge.position.set(0, T, -D / 2 + 0.004); hinge.rotation.x = -0.26;

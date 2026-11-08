@@ -26,12 +26,14 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { toFloat } from "./perf.js";
 import { studioMaterial } from "./studio-material.js";
+import { asset } from "../asset-url.js";
 
 export const BAKE_URL = "/bake/";
 
 /* What part a mesh plays in the bake: "receiver", "emitter", "occluder" or null (ignored) */
 export function bakeRole(o) {
-  if (!o.isMesh || !o.visible || o.userData.proxy || o.isInstancedMesh) return null;
+  // live: small parts lit in real time on purpose (the laptop keyboards), outside the bake
+  if (!o.isMesh || !o.visible || o.userData.proxy || o.userData.live || o.isInstancedMesh) return null;
   const m = o.material;
   if (!m || Array.isArray(m) || m.visible === false) return null;
   let dynamic = false;
@@ -65,13 +67,13 @@ export function fingerprint(receivers) {
 /* Download the bake: manifest, receiver geometry (meshopt) and lightmap atlases (KTX2).
    Resolves to null when there is no bake. */
 export async function loadBake(renderer) {
-  const res = await fetch(`${BAKE_URL}bake.json`).catch(() => null);
+  const res = await fetch(asset(`${BAKE_URL}bake.json`)).catch(() => null);
   if (!res || !res.ok) return null;
   const manifest = await res.json();
   const ktx2 = new KTX2Loader().setTranscoderPath("/basis/").detectSupport(renderer);
   const [gltf, ...lightmaps] = await Promise.all([
-    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(`${BAKE_URL}studio-bake.glb`),
-    ...manifest.atlases.map((a) => ktx2.loadAsync(`${BAKE_URL}${a.file}.ktx2`)),
+    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(asset(`${BAKE_URL}studio-bake.glb`)),
+    ...manifest.atlases.map((a) => ktx2.loadAsync(asset(`${BAKE_URL}${a.file}.ktx2`))),
   ]);
   ktx2.dispose();
   for (const t of lightmaps) { t.channel = 1; t.anisotropy = 4; }
