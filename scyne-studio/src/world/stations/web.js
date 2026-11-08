@@ -268,7 +268,7 @@ const veneers = {};
 function veneer(A, wood) {
   if (veneers[wood]) return veneers[wood];
   const id = wood === "walnut" ? "american_walnut_veneer" : "white_oak_veneer";
-  const t = (map, srgb) => { const x = A.textures[id][map].clone(); x.repeat.set(0.55, 0.55); x.offset.set(0.2, 0.1); if (srgb) x.colorSpace = THREE.SRGBColorSpace; x.needsUpdate = true; return x; };
+  const t = (map, srgb) => { if (!A.textures[id][map]) return null; const x = A.textures[id][map].clone(); x.repeat.set(0.55, 0.55); x.offset.set(0.2, 0.1); if (srgb) x.colorSpace = THREE.SRGBColorSpace; x.needsUpdate = true; return x; };
   veneers[wood] = new THREE.MeshPhysicalMaterial({
     map: t("Diffuse", true), normalMap: t("nor_gl"), roughnessMap: t("arm"), normalScale: new THREE.Vector2(0.6, 0.6),
     color: wood === "walnut" ? "#cc9468" : "#e7c9a2", roughness: 0.75, metalness: 0,

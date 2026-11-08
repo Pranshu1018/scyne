@@ -16,15 +16,15 @@ const reduce = root.classList.contains("rm");
 const still = new URLSearchParams(location.search).has("still"); // snap the camera (screenshots, slow devices)
 
 /* ---------- What this device gets ---------- */
-// The page (text, captions, scrolling) never waits for the 3D studio. A photo of the studio shows
-// at once; the 3D world is a separate download that fades in over it when it is ready.
-//   lite:   Data Saver, 2G, or ≤ 2 GB memory → photos only, nothing 3D is downloaded
-//           (also, when the 3D is about to start: no WebGL, or WebGL drawn in software)
-//   phones: the first screen is the photo; the 3D starts on the first scroll or tap, and until it
-//           is ready the photos follow the stops (it also spares a cellular plan until they engage)
-//   others: the 3D starts once the page has loaded and the browser is idle
+// Every device gets the 3D studio; the page (text, captions, scrolling) never waits for it. A photo
+// of the first stop shows at once and the studio fades in over it when it is ready; the studio then
+// picks its own quality (see TIERS in world/studio.js). Photos are only:
+//   - the placeholder while the 3D loads (they follow the stops until it is ready)
+//   - the fallback where it cannot run: no WebGL, WebGL drawn in software, or the build failing
+// Timing: the 3D starts once the page has loaded and the browser is idle. With Data Saver on or on
+// a 2G connection it waits for the visitor's first scroll or tap, so it is not downloaded unasked.
 const conn = navigator.connection || {};
-const lite = !!conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "") || (navigator.deviceMemory || 8) <= 2;
+const saveData = !!conn.saveData || /(^|-)2g$/.test(conn.effectiveType || "");
 /* Can this device draw the studio? Asked only when the 3D is about to start (creating a WebGL
    context is not free): no WebGL, or WebGL drawn in software, means photos instead. */
 function canDraw3D() {
@@ -37,11 +37,8 @@ function canDraw3D() {
     return !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(name);
   } catch { return false; }
 }
-const coarse = matchMedia("(pointer: coarse)").matches;
-const phone = coarse && Math.min(innerWidth, innerHeight) < 700;
-if (lite) root.classList.add("lite");
 
-/* Photos of each stop (the instant first paint, and the whole tour on lite devices):
+/* Photos of each stop (the instant first paint, and the fallback where the 3D cannot run):
    AVIF, then WebP, with portrait crops for phones */
 const POSTER_W = { land: [960, 1440, 1920], port: [480, 720, 840, 1080] };
 function posterHTML(id) {
@@ -124,22 +121,16 @@ const tags = TAGS.map(([id, n, label]) => {
 function noWorld() { root.classList.add("no-webgl"); canvas.remove(); loaderOn = false; loader.classList.remove("is-on"); showPoster(current); }
 
 async function startWorld() {
-  if (started || lite) return;
+  if (started) return;
   started = true;
   if (!canDraw3D()) return noWorld();
   loaderOn = true; loader.classList.add("is-on"); requestAnimationFrame(loaderTick);
   try {
+    performance.mark("scyne:3d-start");
     const { createStudio } = await import("./world/studio.js");
     studio = createStudio(canvas, {
       reduce, still,
       onProgress: (p) => (loadProgress = p),
-      onTooSlow: () => {
-        // the device could not keep up even on the lightest setting: switch to the photo tour
-        gsap.ticker.remove(frame); gsap.ticker.remove(placeTags);
-        studio.dispose(); studio = null;
-        root.classList.remove("world-on");
-        noWorld();
-      },
       onReady: (ok) => {
         worldReady = true; loadProgress = 1;
         if (!ok) return noWorld();
@@ -182,9 +173,8 @@ function placeTags() {
   }
 }
 
-if (lite) showPoster("intro");
-else if (phone) {
-  // phones: the visitor reads the first screen, the 3D starts as soon as they move
+if (saveData) {
+  // Data Saver / 2G: the photo until the visitor engages, then the 3D
   const go = () => { ["scroll", "pointerdown", "keydown"].forEach((e) => removeEventListener(e, go)); startWorld(); };
   ["scroll", "pointerdown", "keydown"].forEach((e) => addEventListener(e, go, { passive: true, once: true }));
 } else {

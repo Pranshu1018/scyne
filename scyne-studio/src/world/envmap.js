@@ -39,7 +39,8 @@ export async function loadRoomEnv(renderer, url = ENV_URL) {
     const src = new THREE.Texture(bmp);
     src.flipY = false; src.premultiplyAlpha = false; // (flipY is ignored for ImageBitmaps; the shader flips instead) src.colorSpace = THREE.NoColorSpace;
     src.minFilter = src.magFilter = THREE.NearestFilter; src.generateMipmaps = false; src.needsUpdate = true;
-    const target = new THREE.WebGLRenderTarget(bmp.width, bmp.height, { type: THREE.HalfFloatType, depthBuffer: false });
+    // with mipmaps: rough surfaces sample blurrier levels of the same panorama for their reflections
+    const target = new THREE.WebGLRenderTarget(bmp.width, bmp.height, { type: THREE.HalfFloatType, depthBuffer: false, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
     const decode = new THREE.ShaderMaterial({
       uniforms: { map: { value: src } }, vertexShader: VERT, depthTest: false, depthWrite: false,
       fragmentShader: "uniform sampler2D map; varying vec2 vUv; void main(){ vec4 t = texture2D(map, vec2(vUv.x, 1.0 - vUv.y)) * 255.0; gl_FragColor = vec4(t.a > 0.0 ? (t.rgb + 0.5) / 256.0 * exp2(t.a - 128.0) : vec3(0.0), 1.0); }",

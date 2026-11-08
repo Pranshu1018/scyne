@@ -97,10 +97,10 @@ export function buildRoom(scene, A, { shadows = true } = {}) {
   const W = ROOM.x1 - ROOM.x0, D = ROOM.z1 - ROOM.z0, H = ROOM.h;
 
   // ---------- Shell ----------
-  const floor = plane(W, D, A.surface("herringbone_parquet", 6, 4.3, { color: "#c9b49a", roughness: 0.72, roughnessMap: null, metalness: 0, metalnessMap: null, envMapIntensity: 0.5 }));
+  const floor = plane(W, D, A.surface("herringbone_parquet", 6, 4.3, { color: "#b38d68", roughness: 0.56, roughnessMap: null, metalness: 0, metalnessMap: null, envMapIntensity: 0.72 }));
   floor.rotation.x = -Math.PI / 2; room.add(floor);
 
-  const plaster = A.surface("plastered_wall_02", 4, 1, { color: "#e4ded3", metalness: 0, map: null, aoMap: null, normalScale: new THREE.Vector2(0.35, 0.35) });
+  const plaster = A.surface("plastered_wall_02", 4, 1, { color: "#e4ded3", metalness: 0, aoMap: null, normalScale: new THREE.Vector2(0.35, 0.35) });
   const back = plane(W, H, plaster); back.position.set(0, H / 2, ROOM.z0);
   const left = plane(D, H, plaster); left.rotation.y = Math.PI / 2; left.position.set(ROOM.x0, H / 2, 0);
   const right = plane(D, H, plaster); right.rotation.y = -Math.PI / 2; right.position.set(ROOM.x1, H / 2, 0);
@@ -111,7 +111,7 @@ export function buildRoom(scene, A, { shadows = true } = {}) {
   [[ROOM.x0 + 0.01, Math.PI / 2], [ROOM.x1 - 0.01, -Math.PI / 2]].forEach(([x, r]) => { const s = box(D, 0.08, 0.015, mats.oak); s.position.set(x, 0.04, 0); s.rotation.y = r; room.add(s); });
 
   // Ceiling (warm plaster) with an opening above the stairs
-  const ceilMat = A.surface("plastered_wall_02", 5, 3.6, { color: "#ddd7cc", metalness: 0, map: null, aoMap: null, normalScale: new THREE.Vector2(0.3, 0.3) });
+  const ceilMat = A.surface("plastered_wall_02", 5, 3.6, { color: "#ddd7cc", metalness: 0, aoMap: null, normalScale: new THREE.Vector2(0.3, 0.3) });
   const c1 = plane(ROOM.x1 - STAIR.x1, D, ceilMat); c1.rotation.x = Math.PI / 2; c1.position.set((ROOM.x1 + STAIR.x1) / 2, H, 0);
   const c2 = plane(STAIR.x1 - ROOM.x0, STAIR.zBottom - ROOM.z0, ceilMat); c2.rotation.x = Math.PI / 2; c2.position.set((STAIR.x1 + ROOM.x0) / 2, H, (STAIR.zBottom + ROOM.z0) / 2);
   room.add(c1, c2);
@@ -177,16 +177,16 @@ export function buildRoom(scene, A, { shadows = true } = {}) {
     const s = new THREE.SpotLight(color, intensity, 9, angle, 0.7, 1.6);
     s.position.set(...pos); s.target.position.set(...target);
     s.castShadow = shadows && castShadow;
-    if (s.castShadow) { s.shadow.mapSize.set(1024, 1024); s.shadow.bias = -0.0004; s.shadow.normalBias = 0.02; s.shadow.radius = 5; }
+    if (s.castShadow) { s.shadow.mapSize.set(1536, 1536); s.shadow.bias = -0.0004; s.shadow.normalBias = 0.015; s.shadow.radius = 3; }
     room.add(s, s.target);
     return s;
   };
-  spot("#ffe9cc", 16, [-6.4, 6.0, 5.6], [-6.4, 0, 1.0], 0.6, false);          // light down the stairs (no shadow map: one fewer for every shader)
-  spot("#ffe7c8", 8, [-3.4, H - 0.25, -2.9], [-3.4, 0.7, -4.2], 0.85, true);  // design desk
-  spot("#ffe7c8", 13, [1.9, H - 0.25, -2.6], [1.45, 0.75, -4.3], 0.8, true);   // automation desk
-  spot("#fff0dc", 9, [-1.6, H - 0.1, 1.8], [-1.6, 0.7, 1.8], 0.95, true);     // meeting table
-  spot("#ffe9d2", 7, [-1.2, H - 0.1, -3.6], [-1.2, 1.4, -5.0], 0.7, false);   // wash on the brand wall
-  room.add(new THREE.HemisphereLight("#fff4e6", "#5a4a3c", 0.4));
+  spot("#ffe5c5", 14, [-6.4, 6.0, 5.6], [-6.4, 0, 1.0], 0.6, false);          // warm stairwell key
+  spot("#ffdfb5", 11, [-3.4, H - 0.25, -2.9], [-3.4, 0.7, -4.2], 0.85, true); // design desk
+  spot("#ffdfb5", 15, [1.9, H - 0.25, -2.6], [1.45, 0.75, -4.3], 0.8, true).userData.live = true; // automation desk (stays live with baked lighting: it lights the man)
+  spot("#ffe9cf", 11, [-1.6, H - 0.1, 1.8], [-1.6, 0.7, 1.8], 0.95, true);    // meeting table
+  spot("#ffe3c1", 8, [-1.2, H - 0.1, -3.6], [-1.2, 1.4, -5.0], 0.7, false);   // brand wall wash
+  const hemi = new THREE.HemisphereLight("#fff1df", "#49382b", 0.24); hemi.userData.live = true; room.add(hemi);
 
   scene.add(room);
 

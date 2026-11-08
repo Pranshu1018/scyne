@@ -16,6 +16,7 @@ import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { captureCube, loadRoomEnv, bakeRoomEnv } from "./envmap.js";
+import { loadBake, applyBake } from "./bake.js";
 
 import { loadAssets } from "./assets.js";
 import { Screen } from "./kit.js";
@@ -40,7 +41,9 @@ const STOPS = [
 ];
 
 const GrainShader = {
-  uniforms: { tDiffuse: { value: null }, time: { value: 0 }, amount: { value: 0.045 } },
+  // Fine, low-amplitude sensor texture: the former 4.5% noise and heavy vignette softened
+  // every edge and made the whole room look like a compressed game capture.
+  uniforms: { tDiffuse: { value: null }, time: { value: 0 }, amount: { value: 0.006 } },
   vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
   fragmentShader: `
     uniform sampler2D tDiffuse; uniform float time; uniform float amount; varying vec2 vUv;
@@ -48,8 +51,6 @@ const GrainShader = {
     void main(){
       vec4 c = texture2D(tDiffuse, vUv);
       c.rgb += (rand(vUv * vec2(1920.0, 1080.0) + time) - 0.5) * amount;
-      float d = distance(vUv, vec2(0.5));
-      c.rgb *= smoothstep(0.95, 0.3, d) * 0.6 + 0.4;
       gl_FragColor = c;
     }`,
 };
@@ -76,7 +77,8 @@ const DitherShader = {
 };
 
 // How strongly the captured room lights and reflects itself (it stands in for bounced light)
-const ROOM_ENV = 1.35;
+// Keep reflections present but let the practical lights shape the room instead of filling it evenly.
+const ROOM_ENV = 1.0;
 const CAPTURE_AT = new THREE.Vector3(0.6, 1.45, -1.2); // where the room photographs its reflections from
 
 /* After building, nothing but a handful of parts moves, so the rest stops recomputing its
@@ -93,25 +95,31 @@ const smooth = (x) => x * x * x * (x * (x * 6 - 15) + 10);
 const plateau = (x) => smooth(Math.min(1, Math.max(0, (x - 0.2) / 0.6)));
 
 /* Quality tiers. The studio starts at "medium" (phones at "low") and moves itself up or down
-   based on how long frames actually take on this device. */
+   based on how long frames actually take on this device. Below "low" it keeps lowering its
+   resolution (RES_STEPS) rather than ever giving up on the 3D. With baked lighting, AO and the
+   live shadow are off on every tier: the bake already has them. */
 const TIERS = [
   { name: "low",    dpr: 1,    msaa: 2, ao: false, liveShadow: false, bloom: 0.35, uploads: 2 },
-  { name: "medium", dpr: 1.25, msaa: 4, ao: true,  liveShadow: true,  bloom: 0.45, uploads: 3 },
-  { name: "high",   dpr: 1.5,  msaa: 4, ao: true,  liveShadow: true,  bloom: 0.45, uploads: 4 },
+  { name: "medium", dpr: 1.5, msaa: 4, ao: true,  liveShadow: true,  bloom: 0.2, uploads: 3 },
+  { name: "high",   dpr: 1.75, msaa: 4, ao: true,  liveShadow: true,  bloom: 0.2, uploads: 4 },
 ];
+const RES_STEPS = [1, 0.8, 0.65]; // on "low" only: the share of its resolution a struggling device draws
 
-export function createStudio(canvas, { reduce, still, onProgress, onReady, onHover, onSelect, onTooSlow }) {
+export function createStudio(canvas, { reduce, still, onProgress, onReady, onHover, onSelect }) {
   const small = Math.min(window.innerWidth, window.innerHeight) < 700;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance", stencil: false });
-  // Integrated and mobile graphics start on the light tier and step up only if frames are fast;
-  // dedicated graphics start in the middle.
+  // Keep desktop on the medium tier by default so capable integrated GPUs do not receive a
+  // visibly soft, no-AO render. Real frame times still step the tier down when a machine needs it.
   const gpu = (() => { try { const gl = renderer.getContext(), e = gl.getExtension("WEBGL_debug_renderer_info"); return e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : ""; } catch { return ""; } })();
   const weak = /intel|swiftshader|llvmpipe|mali|adreno|powervr|microsoft basic/i.test(gpu) && !/\barc\b/i.test(gpu);
-  let tier = small || weak ? 0 : 1;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIERS[tier].dpr));
+  // ?quality=low|medium|high pins a tier and turns adapting off (benchmarks, comparing looks)
+  const pinned = TIERS.findIndex((T) => T.name === new URLSearchParams(location.search).get("quality"));
+  let tier = pinned >= 0 ? pinned : small ? 0 : 1, resStep = 0;
+  const pixelRatio = () => Math.min(window.devicePixelRatio || 1, TIERS[tier].dpr) * (tier === 0 ? RES_STEPS[resStep] : 1);
+  renderer.setPixelRatio(pixelRatio());
   // AgX: a film-like curve, so lamp highlights roll off softly and warm light stays natural
   renderer.toneMapping = THREE.AgXToneMapping;
-  renderer.toneMappingExposure = 1.4;
+  renderer.toneMappingExposure = 1.0;
   renderer.setClearColor("#060607");
   // checking every shader for errors makes the browser wait for each compile; only in development
   renderer.debug.checkShaderErrors = import.meta.env.DEV;
@@ -127,7 +135,9 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
 
   const state = { progress: 0, pointer: { x: 0, y: 0 }, pointerWorld: null, active: true };
   const stations = {};
-  if (import.meta.env.DEV) window.__studio = { renderer, scene, camera };
+  // dev tools, and ?bench in production for measuring (see README, Benchmarks)
+  const exposed = import.meta.env.DEV || new URLSearchParams(location.search).has("bench");
+  if (exposed) window.__studio = { renderer, scene, camera };
   let room = null, ready = false;
 
   // ---------- Post ----------
@@ -138,7 +148,7 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   composer.addPass(new RenderPass(scene, camera));
   const gtao = small ? null : new GTAOPass(scene, camera, 512, 512);
   if (gtao) { gtao.blendIntensity = 0.9; gtao.updateGtaoMaterial({ radius: 0.45, distanceExponent: 1.5, thickness: 1.2, scale: 1 }); gtao.enabled = TIERS[tier].ao; composer.addPass(gtao); }
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), small ? 0.35 : 0.45, 0.5, 0.9);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), small ? 0.16 : TIERS[tier].bloom, 0.5, 0.92);
   composer.addPass(bloom);
   const outline = small ? null : new OutlinePass(new THREE.Vector2(512, 512), scene, camera);
   if (outline) {
@@ -172,31 +182,37 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   let machine = false;
   function applyTier(next) {
     tier = next;
+    if (tier > 0) resStep = 0;
     const T = TIERS[tier];
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, T.dpr));
+    renderer.setPixelRatio(pixelRatio());
     if (target.samples !== samplesFor(T)) { target.samples = samplesFor(T); target.dispose(); }
-    if (gtao) gtao.enabled = T.ao && !machine;
+    if (gtao) gtao.enabled = T.ao && !machine && !bakedLighting;
     bloom.strength = machine ? 0.2 : T.bloom;
     if (liveShadowLight) liveShadowLight.shadow.autoUpdate = T.liveShadow;
     resize();
-    if (import.meta.env.DEV) console.info(`[scyne] quality: ${T.name}`);
+    if (import.meta.env.DEV) console.info(`[scyne] quality: ${T.name}${tier === 0 && resStep ? ` at ${RES_STEPS[resStep] * 100}% resolution` : ""}`);
   }
-  let liveShadowLight = null;
+  let liveShadowLight = null, bakedLighting = false;
 
   // ---------- Load everything, then build ----------
   // Building is split into short steps that each give the browser a turn, so the page stays
   // responsive (scrolling, taps) while the studio assembles itself in the background.
   const nextTask = () => new Promise((r) => setTimeout(r, 0));
   const T0 = performance.now(), mark = (label) => import.meta.env.DEV && console.info(`[scyne] ${label} ${Math.round(performance.now() - T0)} ms (at ${Math.round(performance.now())})`);
-  const envLoad = loadRoomEnv(renderer); // the baked reflections download alongside the models
-  loadAssets(renderer, onProgress).then(async (A) => {
-    mark("assets loaded");
+  // the baked reflections and the baked lighting download alongside the models
+  const envLoad = loadRoomEnv(renderer);
+  const wantBake = !new URLSearchParams(location.search).has("nobake");
+  const bakeLoad = wantBake ? loadBake(renderer).catch((e) => { console.warn("[scyne] lighting bake failed to load", e); return null; }) : Promise.resolve(null);
+  // with the bake, the room's normal maps are not needed (see loadAssets)
+  loadAssets(renderer, onProgress, { normals: !wantBake }).then(async (A) => {
+    mark("assets loaded"); performance.mark("scyne:assets");
     const pmrem = new THREE.PMREMGenerator(renderer);
     // Light everything with the room's baked reflections. Without the file, a neutral studio light
     // stands in until the room photographs itself further down (slow: only a fallback).
     const baked = await envLoad;
     let neutral = null;
-    if (baked) { scene.environment = pmrem.fromEquirectangular(baked.texture).texture; scene.environmentIntensity = ROOM_ENV; baked.dispose(); }
+    // the panorama itself also stays, as the reflection the studio material samples
+    if (baked) { scene.environment = pmrem.fromEquirectangular(baked.texture).texture; scene.environmentIntensity = ROOM_ENV; }
     else { neutral = pmrem.fromScene(new RoomEnvironment(), 0.04); scene.environment = neutral.texture; scene.environmentIntensity = 0.6; }
 
     let t1 = performance.now(); const step = (l) => { if (import.meta.env.DEV) console.info(`[scyne]   ${l}: ${Math.round(performance.now() - t1)} ms`); t1 = performance.now(); };
@@ -240,6 +256,20 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
       o.shadow.needsUpdate = true;
     });
 
+    // Baked lighting (see bake.js): static surfaces take their light from lightmaps, so the live
+    // lights and shadow maps that did that job go. A light flagged userData.live stays for the
+    // few moving parts (the man, the chair, the phone).
+    const bake = await bakeLoad;
+    t1 = performance.now();
+    if (bake && baked && applyBake(scene, bake, { texture: baked.texture, intensity: ROOM_ENV, maxLod: Math.log2(baked.width) })) {
+      bakedLighting = true;
+      scene.traverse((o) => { if (o.isLight && !o.userData.live) o.visible = false; if (o.isLight) o.castShadow = false; });
+      renderer.shadowMap.enabled = false;
+      if (gtao) gtao.enabled = false; // ambient occlusion is in the bake
+      step("lighting bake applied");
+    } else if (wantBake) A.loadNormals(); // live lighting after all: it wants the normal detail
+    if (bake) { bake.geometries.clear(); if (!bakedLighting) bake.lightmaps.forEach((t) => t.dispose()); }
+
     freezeStatic(scene);
     // Draw each live screen once and upload every texture now, a few at a time, so the first frame
     // does not have to do it all in one go.
@@ -266,7 +296,7 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
       rt.dispose(); neutral.dispose();
     }
     pmrem.dispose();
-    ready = true; mark("ready");
+    ready = true; mark("ready"); performance.mark("scyne:ready");
   }).catch((err) => {
     console.error("[scyne] studio failed to load", err);
     onReady && onReady(false);
@@ -363,25 +393,24 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
     scene.traverse((o) => { if (o.userData.edge) o.visible = on; });
     dither.enabled = on;
     grain.enabled = !on;
-    if (gtao) gtao.enabled = !on && TIERS[tier].ao;
+    if (gtao) gtao.enabled = !on && TIERS[tier].ao && !bakedLighting;
     bloom.strength = on ? 0.2 : TIERS[tier].bloom;
   }
 
   // ---------- Adaptive quality ----------
   // Average frame time decides: slow for ~1.5 s → step down; very fast for ~5 s → step up (once).
-  let ema = 16, slowFor = 0, fastFor = 0, warm = 0, raised = false, tooSlowFor = 0, gaveUp = false;
+  let ema = 16, slowFor = 0, fastFor = 0, warm = 0, raised = false;
   function adapt(dtMs) {
     warm += dtMs;
-    if (warm < 2500 || still) return;              // ignore start-up hitches
+    if (warm < 2500 || still || pinned >= 0) return; // ignore start-up hitches
     ema += (Math.min(dtMs, 100) - ema) * 0.06;
-    if (ema > 24 && tier > 0) { slowFor += dtMs; if (slowFor > 1500) { applyTier(tier - 1); slowFor = 0; fastFor = 0; ema = 16; warm = 1500; } }
-    else slowFor = 0;
+    const canDrop = tier > 0 || resStep < RES_STEPS.length - 1;
+    if (ema > 24 && canDrop) {
+      slowFor += dtMs;
+      if (slowFor > 1500) { if (tier > 0) applyTier(tier - 1); else { resStep++; applyTier(0); } slowFor = 0; fastFor = 0; ema = 16; warm = 1500; }
+    } else slowFor = 0;
     if (!raised && ema < 10 && tier < TIERS.length - 1 && !small) { fastFor += dtMs; if (fastFor > 5000) { raised = true; applyTier(tier + 1); fastFor = 0; warm = 1500; } }
     else fastFor = 0;
-    // still under ~15 fps on the lightest tier for 3 s: this device cannot run the studio well,
-    // so hand over to the photo tour rather than keep it busy
-    if (tier === 0 && ema > 66 && !gaveUp) { tooSlowFor += dtMs; if (tooSlowFor > 3000) { gaveUp = true; onTooSlow && onTooSlow(); } }
-    else tooSlowFor = 0;
   }
 
   // ---------- Frame (driven by the shared GSAP ticker, in step with smooth scrolling) ----------
@@ -421,13 +450,19 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
     grain.uniforms.time.value = t;
     const tr = !firstFrame && performance.now();
     composer.render();
-    if (tr) mark(`first frame took ${Math.round(performance.now() - tr)} ms,`);
+    if (tr) { mark(`first frame took ${Math.round(performance.now() - tr)} ms,`); performance.mark("scyne:first-frame"); }
     adapt(raw * 1000);
     if (!firstFrame) { firstFrame = true; onReady && onReady(true); }
   }
 
-  if (import.meta.env.DEV) Object.assign(window.__studio, {
+  if (exposed) Object.assign(window.__studio, {
     tick, state, composer, stops: STOPS, applyTier,
+    // write the studio out for the Blender lightmap bake (dev only; see tools/bake/README.md)
+    async exportBake() {
+      if (!import.meta.env.DEV) return null;
+      const { exportBake } = await import("./bake-export.js");
+      return exportBake(scene);
+    },
     // re-bake /env/room.webp after changing the room: returns raw RGBE bytes (see README)
     async bakeEnv() {
       const pm = new THREE.PMREMGenerator(renderer), keep = scene.environment, keepI = scene.environmentIntensity;

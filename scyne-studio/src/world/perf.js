@@ -11,7 +11,7 @@ const GET = ["getX", "getY", "getZ", "getW"];
 
 /* Quantized (meshopt) or interleaved attributes become plain float arrays, so they can be
    transformed and merged safely. */
-function toFloat(geo) {
+export function toFloat(geo) {
   for (const name of Object.keys(geo.attributes)) {
     const a = geo.attributes[name];
     if (a.isInterleavedBufferAttribute || !(a.array instanceof Float32Array) || a.normalized) {

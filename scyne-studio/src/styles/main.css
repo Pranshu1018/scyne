@@ -47,7 +47,7 @@ input, textarea { font: inherit; color: inherit; }
 .no-webgl .world, .no-webgl .tags, .no-webgl .mode { display: none; }
 html:not(.in-tour) .shade, html:not(.in-tour) .tags { opacity: 0; pointer-events: none; }
 
-/* ---------- Photo of the studio: first paint, and the whole tour on lite devices ---------- */
+/* ---------- Photo of the studio: first paint while the 3D loads, and the no-WebGL fallback ---------- */
 .posters { position: fixed; inset: 0; z-index: 0; background: var(--bg); pointer-events: none; transition: opacity .9s var(--ease); }
 .poster { position: absolute; inset: 0; opacity: 0; transition: opacity .8s var(--ease); }
 .poster.is-on { opacity: 1; }
@@ -55,7 +55,6 @@ html:not(.in-tour) .shade, html:not(.in-tour) .tags { opacity: 0; pointer-events
 .world { opacity: 0; transition: opacity .9s var(--ease); }
 .world-on .world { opacity: 1; }
 .world-on .posters { opacity: 0; }
-.lite .world, .lite .tags, .lite .mode { display: none; }
 
 /* ---------- Progress pill while the 3D studio loads (the page is usable meanwhile) ---------- */
 .loader {
