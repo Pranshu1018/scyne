@@ -42,8 +42,12 @@ export function loadAssets(renderer, onProgress, { normals = true } = {}) {
   const made = []; // [material, texture set id, repeat x, repeat y] from surface(), for loadNormals()
   const prep = (t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = Math.min(8, maxAniso); return t; };
 
+
   for (const id of MODELS) {
-    jobs.push(either(gltf, asset(`/models/${id}.ktx2.glb`), asset(`/models/${id}.glb`)).then((g) => {
+    // (man-hd.glb, a 2K-texture copy of the man, loads with broken materials: not used)
+    const preferred = asset(`/models/${id}.ktx2.glb`);
+    const fallback = asset(`/models/${id}.glb`);
+    jobs.push(either(gltf, preferred, fallback).then((g) => {
       g.scene.traverse((o) => {
         if (o.isMesh) {
           o.castShadow = true; o.receiveShadow = true;

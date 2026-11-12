@@ -39,10 +39,12 @@ export function cyl(rt, rb, h, mat, seg = 24) {
 /* A live screen: a canvas texture redrawn ~24 times a second by draw(ctx, t, w, h). */
 export class Screen {
   constructor(width, height, worldW, worldH, draw, { brightness = 0.85, fps = 12, res = 1 } = {}) {
-    // draw() works in width × height units; the canvas itself can be smaller (res < 1) to upload less
+    // Keep full source resolution on desktop so the UI stays legible on the wall displays.
+    // Phones retain each screen's smaller upload scale to protect memory and fill rate.
+    const screenRes = Math.min(window.innerWidth, window.innerHeight) < 700 ? res : 1;
     this.canvas = document.createElement("canvas");
-    this.canvas.width = Math.round(width * res); this.canvas.height = Math.round(height * res);
-    this.w = width; this.h = height; this.res = res;
+    this.canvas.width = Math.round(width * screenRes); this.canvas.height = Math.round(height * screenRes);
+    this.w = width; this.h = height; this.res = screenRes;
     // a CPU-side canvas: turning it into a texture is a plain upload, not a slow read back from the GPU
     this.ctx = this.canvas.getContext("2d", { willReadFrequently: true });
     this.texture = new THREE.CanvasTexture(this.canvas);

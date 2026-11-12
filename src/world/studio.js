@@ -11,7 +11,6 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
 import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
@@ -34,7 +33,7 @@ import { mergeStatic, pickProxy } from "./perf.js";
 const STOPS = [
   { id: "intro",      pos: [-5.0, 1.9, 3.95],  look: [1.6, 1.15, -2.9], shift: 0 },
   { id: "websites",   pos: [-2.8, 1.5, -2.35],   look: [-3.3, 1.0, -4.45],  shift: 0.28, mpos: [-3.2, 1.6, -2.05], mlook: [-3.53, 0.95, -4.45] },
-  { id: "automation", pos: [2.5, 1.55, -1.2],  look: [1.3, 1.15, -4.3],  shift: 0.5 },
+  { id: "automation", pos: [2.35, 2.05, -1.65],  look: [1.3, 1.75, -4.3],  shift: 0.5 },
   { id: "assistants", pos: [3.45, 1.3, -1.2],  look: [4.3, 0.85, -3.2],  shift: 0.36, mpos: [3.8, 1.5, -1.0], mlook: [4.05, 0.8, -3.4] },
   { id: "ads",        pos: [2.8, 1.6, 1.5],    look: [7.0, 1.7, 0.9],    shift: 0.38 },
   { id: "contact",    pos: [3.6, 1.65, 3.2],   look: [7.0, 1.8, 3.75],   shift: 0.42 },
@@ -110,10 +109,12 @@ const plateau = (x) => smooth(Math.min(1, Math.max(0, (x - 0.2) / 0.6)));
    live shadow are off on every tier: the bake already has them. */
 const TIERS = [
   { name: "low",    dpr: 1,    msaa: 2, ao: false, liveShadow: false, bloom: 0.35, uploads: 2 },
-  { name: "medium", dpr: 1.5, msaa: 4, ao: true,  liveShadow: true,  bloom: 0.2, uploads: 3 },
-  { name: "high",   dpr: 1.75, msaa: 4, ao: true,  liveShadow: true,  bloom: 0.2, uploads: 4 },
+  { name: "medium", dpr: 1.75, msaa: 4, ao: true,  liveShadow: true,  bloom: 0.2, uploads: 3 },
+  { name: "high",   dpr: 2,    msaa: 4, ao: true,  liveShadow: true,  bloom: 0.2, uploads: 4 },
 ];
-const RES_STEPS = [1, 0.8, 0.65]; // on "low" only: the share of its resolution a struggling device draws
+// Keep the lowest adaptive resolution high enough to avoid a visibly soft scene. A slower
+// device can reduce frame rate at the bottom tier, but it should not turn the studio into blur.
+const RES_STEPS = [1, 0.9, 0.8]; // on "low" only: share of full resolution
 
 export function createStudio(canvas, { reduce, still, onProgress, onReady, onHover, onSelect }) {
   const small = Math.min(window.innerWidth, window.innerHeight) < 700;
@@ -160,13 +161,6 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   if (gtao) { gtao.blendIntensity = 0.9; gtao.updateGtaoMaterial({ radius: 0.45, distanceExponent: 1.5, thickness: 1.2, scale: 1 }); gtao.enabled = TIERS[tier].ao; composer.addPass(gtao); }
   const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), small ? 0.16 : TIERS[tier].bloom, 0.5, 0.92);
   composer.addPass(bloom);
-  const outline = small ? null : new OutlinePass(new THREE.Vector2(512, 512), scene, camera);
-  if (outline) {
-    outline.visibleEdgeColor.set("#ff3d1f"); outline.hiddenEdgeColor.set("#3a0c05");
-    outline.edgeStrength = 3.5; outline.edgeThickness = 1.2; outline.edgeGlow = 0.5; outline.pulsePeriod = 2.4;
-    outline.enabled = false; // only runs while something is hovered
-    composer.addPass(outline);
-  }
   const output = new OutputPass(); composer.addPass(output);
   const finish = addFinish(output);
   const dither = new ShaderPass(DitherShader); dither.enabled = false; composer.addPass(dither);
@@ -177,7 +171,6 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
     composer.setSize(w, h);
     bloom.resolution.set(w / 2, h / 2);
     if (gtao) { const pr = renderer.getPixelRatio(); gtao.setSize(Math.round(w * pr * 0.5), Math.round(h * pr * 0.5)); } // AO at half resolution: soft anyway, a quarter of the cost
-    if (outline) outline.resolution.set(w, h);
     const pr = renderer.getPixelRatio();
     dither.uniforms.resolution.value.set(w * pr, h * pr);
     dither.uniforms.pixel.value = Math.max(2, Math.round(2.5 * pr));
@@ -214,7 +207,7 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   const wantBake = !new URLSearchParams(location.search).has("nobake");
   const bakeLoad = wantBake ? loadBake(renderer).catch((e) => { console.warn("[scyne] lighting bake failed to load", e); return null; }) : Promise.resolve(null);
   // with the bake, the room's normal maps are not needed (see loadAssets)
-  loadAssets(renderer, onProgress, { normals: !wantBake }).then(async (A) => {
+  loadAssets(renderer, onProgress, { normals: !wantBake || !small }).then(async (A) => {
     mark("assets loaded"); performance.mark("scyne:assets");
     const pmrem = new THREE.PMREMGenerator(renderer);
     // Light everything with the room's baked reflections. Without the file, a neutral studio light
@@ -277,7 +270,7 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
       renderer.shadowMap.enabled = false;
       if (gtao) gtao.enabled = false; // ambient occlusion is in the bake
       step("lighting bake applied");
-    } else if (wantBake) A.loadNormals(); // live lighting after all: it wants the normal detail
+    } else if (wantBake && small) A.loadNormals(); // live lighting after all: it wants the normal detail
     if (bake) { bake.geometries.clear(); if (!bakedLighting) bake.lightmaps.forEach((t) => t.dispose()); }
 
     freezeStatic(scene);
@@ -360,7 +353,6 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   function setHover(id) {
     if (id === hovered) return;
     hovered = id;
-    if (outline) { outline.selectedObjects = id ? [stations[id].group] : []; outline.enabled = !!id; }
     onHover && onHover(id);
   }
   let pickTick = 0;

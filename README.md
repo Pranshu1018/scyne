@@ -103,3 +103,24 @@ Production build (`vite build` + `vite preview`) opened with `?bench`: headless 
 The download grew. The bake adds 3.8 MB: geometry with lightmap UVs (2.0 MB) and three ETC1S lightmaps (1.85 MB). The Basis transcoder adds 0.5 MB. ETC1S textures are also 1.4 MB larger than the WebP files they replace, in exchange for staying compressed on the GPU. "Before" could not be re-measured on the RTX 3050. Its frame rate counts animation-frame callbacks, which over-counts a device drawing every other frame; the "after" figures count frames actually drawn.
 
 To re-export models after changing them, see the `gltf-transform optimize ... --simplify-error` commands used in `assets-src/` (sources are not shipped).
+
+## Quick guide
+
+**Stack:** three.js r170 (plain, no React), Vite, GSAP + ScrollTrigger, Lenis. Blender (offline) bakes the lighting and converts models. No backend.
+
+**Run:** `npm install`, then `npm run dev`. Production: `npm run build` and `npm run preview`.
+
+**What loads when**
+- The preloader (`.pre` in `index.html`, styles in `main.css`, logic at the top of `main.js`) is plain HTML and CSS; its counter follows the studio's real loading progress.
+- The studio (`src/world/`) loads in its own chunk; the projects corridor (`src/ui/corridor.js`) only on wide screens, when the page starts.
+
+**Swapping things**
+- **Projects:** each `<li class="dcard">` in `index.html` is one project: name, services, year, `data-for`, `data-url`, a screenshot in `public/projects/` and its `--c` colour. The corridor, the list on phones, the showreel and the case study all read from these.
+- **Copy:** all text is in `index.html`. Anything still invented carries `data-placeholder` (dashed outline in dev).
+- **The man:** replace `public/models/man.glb`, then `node tools/compress-textures.mjs --models`. Pose values are `POSE` in `src/world/man.js`; a MetaHuman goes through `tools/metahuman/`.
+- **Models and textures:** `public/models`, `public/textures`; after changing the room, re-bake (`tools/bake/README.md`) and re-capture the loading photos (`node tools/posters.cjs`).
+- **Colours and type:** the variables at the top of `src/styles/main.css`; fonts are loaded in `index.html`.
+
+**Extras** (`src/ui/extras.js`): the About statement that lights up with the scroll, the showreel, the dots behind the contact form, magnetic buttons, and the easter egg (type `scyne`, or the Konami code). `public/404.html` is the not-found page.
+
+**Deploy:** push to `main` on GitHub; Vercel builds with `npm run build` and serves `dist`. `vercel.json` sets long-lived caching for the versioned asset folders.

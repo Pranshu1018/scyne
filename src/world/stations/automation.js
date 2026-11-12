@@ -13,10 +13,10 @@ import { laptop, plate, phone, mug, notebook } from "../devices.js";
 import { prepareMan } from "../man.js";
 
 // ---------- Wall board: today's work, moving by itself ----------
-const COLS = ["New enquiry", "Saved to CRM", "Replied", "Booked", "Invoiced"];
+// Four short stages leave enough physical room for the board text to read from the tour camera.
+const COLS = ["INBOX", "IN PROGRESS", "BOOKED", "PAID"];
 const CARDS = [
-  "Priya S. · Website form", "Dental clinic · WhatsApp", "R. Mehta · Google Ads", "Café Lumen · Instagram",
-  "J. Fernandes · Call back", "Studio Nine · Website form", "A. Khan · Meta lead", "Oakfield Homes · Email",
+  "Priya S. · Website enquiry", "Dental clinic · WhatsApp", "Café Lumen · Booking", "Oakfield Homes · Invoice",
 ];
 const STEP = 1.6; // seconds per card move
 
@@ -28,41 +28,43 @@ function cardState(i, t) {
 
 function drawBoard(ctx, t, w, h) {
   ctx.fillStyle = "#101113"; ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = "#ece8df"; ctx.font = `600 36px ${FONT}`; ctx.textBaseline = "middle";
-  ctx.fillText("Today's work", 44, 52);
-  ctx.fillStyle = "#3ddc84"; ctx.font = `500 20px ${MONO}`;
-  ctx.fillText(`● RUNNING ON ITS OWN  ·  ${23 + Math.floor(t / STEP)} TASKS DONE  ·  0 BY HAND`, 44, 94);
-  const cw = (w - 88) / COLS.length;
+  ctx.fillStyle = "#f3f0e9"; ctx.font = `600 62px ${FONT}`; ctx.textBaseline = "middle";
+  ctx.fillText("Today's work", 52, 76);
+  ctx.fillStyle = "#69e79a"; ctx.font = `500 30px ${MONO}`;
+  ctx.fillText(`● RUNNING  ·  ${23 + Math.floor(t / STEP)} TASKS DONE  ·  0 BY HAND`, 52, 138);
+  const inset = 52;
+  const cw = (w - inset * 2) / COLS.length;
   COLS.forEach((c, i) => {
-    const x = 44 + i * cw;
-    rr(ctx, x + 6, 130, cw - 12, h - 160, 18); ctx.fillStyle = "#17181b"; ctx.fill();
-    ctx.fillStyle = i === COLS.length - 1 ? "#3ddc84" : "#8d8b93"; ctx.font = `500 18px ${MONO}`; ctx.fillText(c.toUpperCase(), x + 24, 160);
+    const x = inset + i * cw;
+    rr(ctx, x + 7, 194, cw - 14, h - 232, 18); ctx.fillStyle = "#17191b"; ctx.fill();
+    ctx.fillStyle = i === COLS.length - 1 ? "#69e79a" : "#c0bdb6"; ctx.font = `600 30px ${MONO}`; ctx.fillText(c, x + 26, 233);
   });
   CARDS.forEach((name, i) => {
     const { col, k } = cardState(i, t);
     if (col >= COLS.length) return;
-    const fromX = 44 + Math.max(0, col - 1) * cw, toX = 44 + col * cw;
+    const fromX = inset + Math.max(0, col - 1) * cw, toX = inset + col * cw;
     const x = col === 0 ? toX : fromX + (toX - fromX) * k;
-    const y = 190 + (i % 3) * 96;
+    const y = 276 + i * 180;
     const last = col === COLS.length - 1;
     ctx.globalAlpha = col === 0 ? k : 1;
-    rr(ctx, x + 16, y, cw - 32, 80, 12); ctx.fillStyle = last ? "#1f3a2a" : "#ece8df"; ctx.fill();
-    ctx.fillStyle = last ? "#d7f5e2" : "#121212"; ctx.font = `600 20px ${FONT}`;
-    ctx.fillText(name.split(" · ")[0], x + 32, y + 28);
-    ctx.font = `400 16px ${FONT}`; ctx.fillStyle = last ? "#8fd4aa" : "#666";
-    ctx.fillText(last ? "✓ Paid invoice sent" : name.split(" · ")[1], x + 32, y + 56);
+    rr(ctx, x + 18, y, cw - 36, 142, 12); ctx.fillStyle = last ? "#245136" : "#f4f1eb"; ctx.fill();
+    ctx.fillStyle = last ? "#f0fff4" : "#111315"; ctx.font = `700 36px ${FONT}`;
+    ctx.fillText(name.split(" · ")[0], x + 36, y + 48);
+    ctx.font = `500 28px ${FONT}`; ctx.fillStyle = last ? "#b8edca" : "#494b4d";
+    ctx.fillText(last ? "✓ Invoice sent" : name.split(" · ")[1], x + 36, y + 98);
     ctx.globalAlpha = 1;
   });
 }
 
 // ---------- The jobs running around him ----------
 const JOBS = [
-  { icon: "mail", title: "Email answered", sub: "Priya S. asked about prices", doing: "Replying", pos: [-0.9, 1.74, 1.15] },
-  { icon: "cal", title: "Meeting booked", sub: "Thu 3:00 pm · in both calendars", doing: "Booking", pos: [-1.12, 1.36, 1.4] },
+  { icon: "mail", title: "Email answered", sub: "Prices & availability", doing: "Replying", pos: [-0.9, 1.74, 1.15] },
+  { icon: "cal", title: "Meeting booked", sub: "Thu 3 pm · both calendars", doing: "Booking", pos: [-1.12, 1.36, 1.4] },
   { icon: "chat", title: "Support chat closed", sub: "Order #2381 · tracking sent", doing: "Replying", pos: [0.95, 1.78, 1.0] },
   { icon: "doc", title: "Invoice sent", sub: "Oakfield Homes · reminder set", doing: "Sending", pos: [1.05, 1.36, 1.3] },
-  { icon: "user", title: "New lead saved", sub: "From Google Ads · call at 5 pm", doing: "Saving", pos: [-0.95, 0.98, 1.6] },
+  { icon: "user", title: "New lead saved", sub: "Google Ads · call at 5 pm", doing: "Saving", pos: [-0.95, 0.98, 1.6] },
 ];
+const BLINK = 1.5; // how far the upper lids slide down to close, in the avatar's units (cm)
 const CYCLE = 7.5; // each job runs, finishes, rests, then runs again
 const RUN = 0.32;  // share of the cycle spent "running"
 
@@ -87,8 +89,8 @@ function drawJob(job, i) {
     rr(ctx, 30, h / 2 - 50, 100, 100, 24); ctx.fillStyle = "rgba(255,255,255,0.08)"; ctx.fill();
     icon(ctx, job.icon, 80, h / 2, 76);
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "#f2efe8"; ctx.font = `600 38px ${FONT}`; ctx.fillText(job.title, 158, h / 2 - 24);
-    ctx.fillStyle = "#9a978f"; ctx.font = `400 26px ${FONT}`; ctx.fillText(job.sub, 158, h / 2 + 24);
+    ctx.fillStyle = "#f2efe8"; ctx.font = `600 42px ${FONT}`; ctx.fillText(job.title, 158, h / 2 - 28);
+    ctx.fillStyle = "#c8c5be"; ctx.font = `400 28px ${FONT}`; ctx.fillText(job.sub, 158, h / 2 + 30);
     if (running) {
       ctx.fillStyle = "#c9c6bf"; ctx.font = `500 22px ${MONO}`; ctx.textAlign = "right";
       ctx.fillText(`${job.doing.toUpperCase()}${".".repeat(1 + Math.floor(t * 3) % 3)}`, w - 34, 44); ctx.textAlign = "left";
@@ -134,8 +136,8 @@ export function buildAutomation(A) {
   g.updateMatrixWorld(true);
 
   // wall board, high enough to clear his head
-  const board = display(1.5, 0.844, drawBoard, { px: 1600, fps: 12, res: 0.7 });
-  board.group.position.set(0.15, 2.17, -0.215);
+  const board = display(1.98, 1.114, drawBoard, { px: 1920, fps: 12, res: 1, brightness: 1 });
+  board.group.position.set(0.15, 2.12, -0.215);
   g.add(board.group);
   // oak slats on black felt behind the desk, washed by a light hidden in the ceiling
   const PW = 2.1, PH = 3.2;
@@ -174,6 +176,12 @@ export function buildAutomation(A) {
   man.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = true; o.receiveShadow = true; } });
   sitter.add(man);
   g.add(tilt);
+  // A soft neutral key from the camera side brings out the face and shirt texture.
+  const faceKey = new THREE.SpotLight("#f2e5d7", 5, 4.2, 0.72, 0.82, 2);
+  faceKey.position.set(0.2, 2.65, 2.45);
+  faceKey.target.position.set(0.15, 1.55, 0.28);
+  faceKey.castShadow = false;
+  g.add(faceKey, faceKey.target);
   // sat in the chair (the sitter's space), elbows out, hands clasped behind his neck (see man.js)
   const body = prepareMan(man);
   tilt.userData.dynamic = true; // he breathes, so his mesh stays out of the static merge
@@ -183,13 +191,21 @@ export function buildAutomation(A) {
   const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
   const moving = (body ? [[body.spine[0], X], [body.spine[1], X], [body.head, Y], [body.neck, X]] : []).map(([b, v]) =>
     b && { b, base: b.quaternion.clone(), axis: axisIn(b, v) });
-  const qTmp = new THREE.Quaternion();
+  const qTmp = new THREE.Quaternion(), qTmp2 = new THREE.Quaternion();
   const turn = (m, a) => { if (m) m.b.quaternion.copy(m.base).premultiply(qTmp.setFromAxisAngle(m.axis, a)); };
+  // eyes and lids turn about two axes: left-right (yaw) and up-down (pitch)
+  const two = (b) => b && { b, base: b.quaternion.clone(), yaw: axisIn(b, Y), pitch: axisIn(b, X) };
+  const turn2 = (m, yaw, pitch) => { if (m) m.b.quaternion.copy(m.base).premultiply(qTmp.setFromAxisAngle(m.yaw, yaw)).premultiply(qTmp2.setFromAxisAngle(m.pitch, pitch)); };
+  const eyes = (body ? body.eyes : []).map(two);
+  // the upper lids close by sliding down (this avatar's lid bones are moved, not turned)
+  const lids = (body ? body.lids : []).map((b) => ({ b, base: b.position.clone(), down: axisIn(b, Y).negate() }));
+  const gaze = { x: 0, y: 0 }; // where he is looking, easing towards the pointer
+  let nextBlink = 2.5, blinkAt = -1;
 
   // glass cards around him, each fed by a line of light from the laptop
   g.updateMatrixWorld(true);
   const from = lap.top.clone().applyAxisAngle(Y, Math.PI + 0.12).add(lap.group.position);
-  const viewer = new THREE.Vector3(2.5, 1.55, -1.2); // the automation camera stop, in room space
+  const viewer = new THREE.Vector3(2.35, 2.05, -1.65); // the automation camera stop, in room space
   const lineMat = new THREE.MeshBasicMaterial({ color: new THREE.Color("#ffd9c8").multiplyScalar(0.5), transparent: true, opacity: 0.45, depthWrite: false, toneMapped: false });
   const pulseMat = new THREE.MeshBasicMaterial({ color: new THREE.Color("#ff5a3a").multiplyScalar(4), toneMapped: false });
   const jobs = JOBS.map((job, i) => {
@@ -223,14 +239,22 @@ export function buildAutomation(A) {
     group: g,
     layout,
     anchor: new THREE.Vector3(DX, 2.75, -0.2),
-    update(t) {
+    update(t, dt, state) {
       board.screen.update(t);
       lap.screen.update(t);
       phoneScreen.update(t);
       const breath = Math.sin(t * 1.35);
       turn(moving[0], breath * 0.006); turn(moving[1], breath * 0.01);
-      turn(moving[2], Math.sin(t * 0.21) * 0.035 + Math.sin(t * 0.57) * 0.01);
-      turn(moving[3], Math.sin(t * 0.17 + 1) * 0.015);
+      // he glances towards the pointer: the eyes lead, the head follows a little
+      const k = Math.min(1, (dt || 0.016) * 2.2), p = state ? state.pointer : gaze;
+      gaze.x += (p.x - gaze.x) * k; gaze.y += (p.y - gaze.y) * k;
+      turn(moving[2], Math.sin(t * 0.21) * 0.035 + Math.sin(t * 0.57) * 0.01 + gaze.x * 0.2);
+      turn(moving[3], Math.sin(t * 0.17 + 1) * 0.015 - gaze.y * 0.06);
+      for (const e of eyes) turn2(e, gaze.x * 0.3, -gaze.y * 0.16);
+      // a blink every few seconds: lids down in 70 ms, up in 110
+      if (t > nextBlink) { blinkAt = t; nextBlink = t + 2.4 + Math.random() * 3.6; }
+      const b = t - blinkAt, shut = b < 0 || b > 0.18 ? 0 : b < 0.07 ? b / 0.07 : 1 - (b - 0.07) / 0.11;
+      for (const l of lids) l.b.position.copy(l.base).addScaledVector(l.down, shut * BLINK);
       for (const j of jobs) {
         j.s.update(t);
         j.card.position.y = j.y + Math.sin(t * 0.8 + j.i * 1.7) * 0.012;

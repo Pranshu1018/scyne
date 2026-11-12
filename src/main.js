@@ -10,6 +10,7 @@ import { initDrawer } from "./ui/drawer.js";
 import { initCursor } from "./ui/cursor.js";
 import { initSound } from "./ui/sound.js";
 import { initSections } from "./ui/sections.js";
+import { initExtras } from "./ui/extras.js";
 import { asset } from "./asset-url.js";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -88,20 +89,45 @@ const drawer = initDrawer({ lenis, goTo });
 const cursor = initCursor(gsap);
 const sound = initSound();
 
-/* ---------- Progress pill while the 3D studio loads (never blocks the page) ---------- */
-const loader = document.querySelector(".loader");
-const countEl = loader.querySelector(".loader__count");
-let loadProgress = 0, worldReady = false, shown = 0, loaderOn = false;
-function loaderTick() {
-  if (!loaderOn) return;
-  const goal = Math.min(100, loadProgress * 90 + (worldReady ? 10 : 0));
-  shown += (goal - shown) * 0.12;
-  const n = Math.round(shown);
-  countEl.textContent = `${n}%`;
-  loader.style.setProperty("--p", n / 100);
-  if (worldReady && n >= 99) { loaderOn = false; loader.classList.remove("is-on"); return; }
-  requestAnimationFrame(loaderTick);
+/* ---------- Preloader (styles: main.css) ----------
+   The counter follows the studio's real progress: files downloaded (90%), then the scene built
+   and its first frame drawn (the last 10%). Nothing of the page shows until then. On a slow
+   connection a button appears to enter straight away: the photos stand in and the 3D joins
+   when it is ready. With Data Saver, or without WebGL, it opens after a moment on the photos. */
+window.__scyneBoot = true;
+const pre = document.querySelector(".pre");
+const preCount = pre.querySelector(".pre__count b"), prePhrase = pre.querySelector(".pre__phrase"), preSkip = pre.querySelector(".pre__skip");
+const PHRASES = ["Unlocking the door", "Switching on the lights", "Booting the screens", "Waking the team", "Come on in"];
+const PRE_MIN = 1400; // ms the preloader stays at least, so a cached visit does not flicker
+let loadProgress = 0, worldReady = false, shown = 0, revealed = false, phrase = 0, giveUp = false;
+const preT0 = performance.now();
+lenis && lenis.stop();
+function reveal() {
+  if (revealed) return;
+  revealed = true;
+  pre.classList.add("is-done");
+  // the hero and the nav come in as the curtain clears the middle of the screen
+  setTimeout(() => { root.classList.remove("is-loading"); lenis && lenis.start(); ScrollTrigger.refresh(); performance.mark("scyne:revealed"); }, reduce ? 150 : 950);
+  setTimeout(() => pre.remove(), 2000);
 }
+function preTick() {
+  if (revealed) return;
+  const goal = giveUp ? 100 : Math.min(100, loadProgress * 90 + (worldReady ? 10 : 0));
+  shown += Math.max(0.15, (goal - shown) * 0.09) * (goal > shown ? 1 : 0);
+  shown = Math.min(shown, goal);
+  const n = Math.round(shown);
+  preCount.textContent = String(n).padStart(3, "0");
+  pre.style.setProperty("--p", (shown / 100).toFixed(3));
+  const want = Math.min(PHRASES.length - 1, Math.floor((shown / 100) * PHRASES.length));
+  if (want !== phrase) { phrase = want; const el = document.createElement("span"); el.textContent = PHRASES[want]; prePhrase.replaceChildren(el); }
+  if (n >= 100 && (worldReady || giveUp) && performance.now() - preT0 > PRE_MIN) return reveal();
+  requestAnimationFrame(preTick);
+}
+if (still) { // screenshots and tools: no preloader
+  revealed = true; pre.remove(); root.classList.remove("is-loading"); lenis && lenis.start();
+} else requestAnimationFrame(preTick);
+setTimeout(() => { if (!revealed) preSkip.hidden = false; }, 9000);
+preSkip.addEventListener("click", () => { giveUp = true; });
 
 /* ---------- The studio (loaded on demand, in its own chunk) ---------- */
 const canvas = document.querySelector(".world");
@@ -121,13 +147,12 @@ const tags = TAGS.map(([id, n, label]) => {
   return { id, el };
 });
 
-function noWorld() { root.classList.add("no-webgl"); canvas.remove(); loaderOn = false; loader.classList.remove("is-on"); showPoster(current); }
+function noWorld() { root.classList.add("no-webgl"); canvas.remove(); giveUp = true; showPoster(current); }
 
 async function startWorld() {
   if (started) return;
   started = true;
   if (!canDraw3D()) return noWorld();
-  loaderOn = true; loader.classList.add("is-on"); requestAnimationFrame(loaderTick);
   try {
     performance.mark("scyne:3d-start");
     const { createStudio } = await import("./world/studio.js");
@@ -177,13 +202,11 @@ function placeTags() {
 }
 
 if (saveData) {
-  // Data Saver / 2G: the photo until the visitor engages, then the 3D
+  // Data Saver / 2G: open on the photo; the 3D is fetched once the visitor engages
+  giveUp = true;
   const go = () => { ["scroll", "pointerdown", "keydown"].forEach((e) => removeEventListener(e, go)); startWorld(); };
   ["scroll", "pointerdown", "keydown"].forEach((e) => addEventListener(e, go, { passive: true, once: true }));
-} else {
-  const whenIdle = () => ("requestIdleCallback" in window ? requestIdleCallback(startWorld, { timeout: 1500 }) : setTimeout(startWorld, 300));
-  if (document.readyState === "complete") whenIdle(); else addEventListener("load", whenIdle, { once: true });
-}
+} else startWorld(); // straight away: the preloader is covering the page
 
 /* Scroll drives the camera; each stop fades its caption in and updates the progress label */
 const progN = document.querySelector(".progress__n"), progT = document.querySelector(".progress__t"), progBar = document.querySelector(".progress__bar");
@@ -195,18 +218,15 @@ ScrollTrigger.create({
     progBar.style.setProperty("--p", progress);
   },
 });
-ScrollTrigger.create({
-  trigger: ".tour", start: "top top", end: "bottom 30%",
-  onToggle(self) {
-    root.classList.toggle("in-tour", self.isActive);
-    studio && studio.setActive(self.isActive);
-  },
-  // also on every recalculation (a reload or jump straight past the tour never "toggles")
-  onRefresh(self) {
-    root.classList.toggle("in-tour", self.isActive);
-    studio && studio.setActive(self.isActive);
-  },
-});
+// In the tour until its end has scrolled past. Decided from the progress, not from enter/leave
+// events: a jump straight from the top to below the tour crosses it without "entering" it.
+const setInTour = (self) => {
+  const on = self.progress < 1;
+  if (on === root.classList.contains("in-tour")) return;
+  root.classList.toggle("in-tour", on);
+  studio && studio.setActive(on);
+};
+ScrollTrigger.create({ trigger: ".tour", start: "top top", end: "bottom 30%", onUpdate: setInTour, onRefresh: setInTour });
 stops.forEach((s, i) => {
   ScrollTrigger.create({
     trigger: s, start: "top 60%", end: "bottom 60%",
@@ -241,10 +261,11 @@ if (!reduce && "IntersectionObserver" in window) {
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
   }, { rootMargin: "0px 0px -10% 0px" });
-  document.querySelectorAll(".block__head, .svc, .case, .stats li, .quotes, .promises > div, .form").forEach((el) => { el.classList.add("rv"); io.observe(el); });
+  document.querySelectorAll(".block__head, .svc, .case, .stats li, .quotes, .promises > div, .form, .reel__frame, .about__facts li").forEach((el) => { el.classList.add("rv"); io.observe(el); });
 }
 
 initSections({ gsap, ScrollTrigger, lenis, reduce, drawer });
+initExtras({ gsap, ScrollTrigger, reduce });
 initForm();
 document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());

@@ -233,9 +233,10 @@ function initDeck({ gsap, ScrollTrigger, lenis, reduce, $, $$ }) {
       $(".corridor__title", info).textContent = text(card, ".dcard__name");
       $(".corridor__for", info).textContent = card.dataset.for || "";
       $(".corridor__p", info).textContent = story[1] || "";
-      const stamp = card.querySelector(".case__stamp");
-      const rows = [["Services", text(card, ".dcard__what")], ["Result", `${stamp.firstChild.textContent.trim()} ${stamp.querySelector("small").textContent}`], ["Year", text(card, ".dcard__year")]];
+      const rows = [["Focus", text(card, ".dcard__what")], ["Details", card.dataset.for || ""], ["Status", "Live website"]];
       $(".corridor__spec", info).replaceChildren(...rows.map(([k, v]) => { const d = document.createElement("div"); d.innerHTML = "<dt></dt><dd></dd>"; d.firstChild.textContent = k; d.lastChild.textContent = v; return d; }));
+      const liveLink = $(".corridor__view", info);
+      liveLink.href = card.dataset.url;
       $(".corridor__next span", info).textContent = text(cards[(i + 1) % n], ".dcard__name");
     };
     const openProject = (i) => {
@@ -260,7 +261,6 @@ function initDeck({ gsap, ScrollTrigger, lenis, reduce, $, $$ }) {
       lenis && lenis.start();
     };
     $(".corridor__x", info).addEventListener("click", closeProject);
-    $(".corridor__view", info).addEventListener("click", () => { const i = opened; closeProject(); view.open(cards[i]); });
     $(".corridor__next", info).addEventListener("click", () => {
       const next = (opened + 1) % n;
       closeProject();
@@ -341,6 +341,7 @@ function initCaseView({ lenis, $ }) {
       el.style.setProperty("--c", getComputedStyle(card).getPropertyValue("--c"));
       k.textContent = `${card.querySelector(".dcard__what").textContent} · ${card.querySelector(".dcard__year").textContent}`;
       title.textContent = card.querySelector(".dcard__name").textContent;
+      cta.href = card.dataset.url;
       art.replaceChildren(card.querySelector(".case__art").cloneNode(true));
       story.replaceChildren(...card.querySelector(".dcard__story").cloneNode(true).childNodes);
       el.hidden = false;

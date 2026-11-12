@@ -1,5 +1,5 @@
 /* The projects corridor: a bending wireframe tunnel you walk down by scrolling, the projects
-   hung flat on its walls and ceiling, each one tinting the grid around it with its colour.
+   hung flat on its walls, ceiling and floor, each one tinting the grid around it with its colour.
    Clicking a project peels it off the wall to face you.
 
    Two layers share one camera: WebGL draws the tunnel's lines (three.js), and the projects
@@ -11,7 +11,7 @@ import { CSS3DRenderer, CSS3DObject } from "three/examples/jsm/renderers/CSS3DRe
 
 const W = 6, H = 4;         // tunnel cross-section (world units)
 const SAMPLES = 220;        // points along the path
-const RING_EVERY = 3;       // a cross-ring every n samples
+const RING_EVERY = 1;       // a cross-ring every n samples (cells come out near square)
 const PANEL_W = 3.7;        // project width on the wall
 const PX = 640;             // the mockup's width in CSS pixels
 
@@ -26,8 +26,8 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
   host.append(renderer.domElement, css.domElement);
 
   const scene = new THREE.Scene(), cssScene = new THREE.Scene();
-  scene.fog = new THREE.Fog("#050506", 7, 42);
-  const camera = new THREE.PerspectiveCamera(68, 1, 0.05, 120);
+  scene.fog = new THREE.Fog("#050506", 5, 34);
+  const camera = new THREE.PerspectiveCamera(72, 1, 0.05, 120);
 
   // ---------- the path: a gentle S-bend that rises and dips a little ----------
   const L = 14 * (n + 1);
@@ -50,12 +50,12 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
 
   // ---------- where each project hangs ----------
   const colors = cards.map((c) => new THREE.Color(getComputedStyle(c).getPropertyValue("--c").trim() || "#ff3d1f"));
-  const spots = cards.map((_, i) => ({ u: 0.09 + i * (0.8 / Math.max(1, n - 1)), wall: ["left", "right", "ceiling"][i % 3 === 2 ? 2 : i % 2] }));
+  const spots = cards.map((_, i) => ({ u: 0.09 + i * (0.8 / Math.max(1, n - 1)), wall: ["right", "ceiling", "left", "floor", "right", "ceiling", "left", "floor"][i % 8] }));
 
   // ---------- the tunnel's lines, tinted by the projects near them ----------
   // cross-section outline points (local x along right, y along up), walls subdivided into cells
   const across = [];
-  const cols = 8, rows = 5;
+  const cols = 12, rows = 8;
   for (let i = 0; i <= cols; i++) across.push([-W / 2 + (W * i) / cols, -H / 2]);         // floor
   for (let j = 1; j <= rows; j++) across.push([W / 2, -H / 2 + (H * j) / rows]);          // right wall
   for (let i = cols - 1; i >= 0; i--) across.push([-W / 2 + (W * i) / cols, H / 2]);     // ceiling
@@ -64,7 +64,7 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
   const panelPos = spots.map((s) => wallPoint(frameAt(s.u), s.wall));
   const pos = [], col = [];
   const tint = (v) => {
-    const c = new THREE.Color(0.55, 0.55, 0.58);
+    const c = new THREE.Color(0.8, 0.8, 0.82);
     panelPos.forEach((pp, i) => {
       const d = v.distanceTo(pp);
       const k = Math.exp(-(d * d) / 18) * 1.6;
@@ -88,7 +88,7 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
   geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
-  const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.75, fog: true }));
+  const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8, fog: true }));
   scene.add(lines);
   // a soft glow behind each project, lighting the dark around it
   const glowTex = (() => {
@@ -98,14 +98,16 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
     g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
     return new THREE.CanvasTexture(c);
   })();
-  panelPos.forEach((pp, i) => {
+  const glows = panelPos.map((pp, i) => {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: colors[i], transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, fog: true }));
     s.position.copy(pp); s.scale.setScalar(7.5); scene.add(s);
+    return s;
   });
 
   function wallPoint(f, wall) {
     if (wall === "left") return world(f, [-W / 2 + 0.02, 0.15]);
     if (wall === "right") return world(f, [W / 2 - 0.02, 0.15]);
+    if (wall === "floor") return world(f, [0, -H / 2 + 0.02]);
     return world(f, [0, H / 2 - 0.02]);
   }
 
@@ -124,7 +126,9 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
     if (wall === "left") { z = f.r.clone(); y = f.up.clone(); x = f.t.clone(); }
     else if (wall === "right") { z = f.r.clone().negate(); y = f.up.clone(); x = f.t.clone().negate(); }
     // ceiling: further along the tunnel shows lower on screen, so the art's top faces back towards you
-    else { z = f.up.clone().negate(); y = f.t.clone().negate(); x = f.r.clone(); }
+    else if (wall === "ceiling") { z = f.up.clone().negate(); y = f.t.clone().negate(); x = f.r.clone(); }
+    // floor: its top edge points down the tunnel, so it reads upright as you walk towards it
+    else { z = f.up.clone(); y = f.t.clone(); x = f.r.clone(); }
     const m = new THREE.Matrix4().makeBasis(x, y, z);
     obj.quaternion.setFromRotationMatrix(m);
     obj.position.copy(panelPos[i]);
@@ -138,7 +142,7 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
   });
 
   // ---------- camera along the path ----------
-  const U0 = 0.0, U1 = panels[n - 1].u - 0.075, AHEAD = 0.075; // end with the last project just ahead
+  const AHEAD = 0.06, U0 = panels[0].u - AHEAD, U1 = panels[n - 1].u - AHEAD; // start and end with a project beside you
   const camU = (p) => U0 + p * (U1 - U0);
   const pointer = { x: 0, y: 0 };
   host.addEventListener("pointermove", (e) => {
@@ -186,6 +190,11 @@ export function createCorridor({ host, cards, onHover, onOpen }) {
       pn.obj.scale.setScalar(pn.home.s * (1 + 0.05 * k) * (1 - 0.32 * k));
     });
 
+    // an open project takes the light: the grid and the other glows dim behind it
+    const dim = easeInOut(peel);
+    lines.material.opacity = 0.8 - 0.55 * dim;
+    glows.forEach((g, i) => { g.material.opacity = 0.55 * (i === lastOpen ? 1 : 1 - 0.8 * dim); });
+    panels.forEach((pn, i) => { pn.el.style.opacity = i === lastOpen ? "1" : (1 - 0.75 * dim).toFixed(2); });
     renderer.render(scene, camera);
     css.render(cssScene, camera);
     // the project beside you is the current one

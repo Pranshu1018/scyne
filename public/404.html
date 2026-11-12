@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page not found · Scyne Studio</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/favicon.svg" />
+  <style>
+    :root { --bg: #07070a; --ink: #ece8df; --mute: #8d8b93; --red: #ff3d1f; color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; display: grid; place-items: center; background: var(--bg); color: var(--ink); font-family: "Geist", "Helvetica Neue", Arial, system-ui, sans-serif; overflow: hidden; }
+    main { display: grid; gap: 28px; justify-items: center; text-align: center; padding: 24px; }
+    .n { display: flex; align-items: center; gap: .04em; font-weight: 800; font-size: clamp(120px, 34vw, 460px); line-height: .8; letter-spacing: -.06em; user-select: none; }
+    /* the zero is an eye: it follows the pointer and blinks */
+    .eye { position: relative; width: .62em; height: .78em; border-radius: 50%; border: .1em solid var(--ink); display: grid; place-items: center; overflow: hidden; animation: blink 5s infinite; }
+    .eye i { width: .2em; height: .2em; border-radius: 50%; background: var(--red); box-shadow: 0 0 .2em var(--red); transform: translate(var(--x, 0), var(--y, 0)); transition: transform .12s ease-out; }
+    @keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.06); } }
+    p { margin: 0; max-width: 34ch; color: #b9b5ad; font-size: 18px; line-height: 1.5; }
+    .k { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+    a { display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 99px; background: var(--red); color: #000; font-weight: 600; text-decoration: none; transition: background .3s; }
+    a:hover, a:focus-visible { background: var(--ink); }
+    a:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) { .eye { animation: none; } .eye i { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="k">Error 404</p>
+    <h1 class="n" aria-label="404">4<span class="eye" aria-hidden="true"><i></i></span>4</h1>
+    <p>We looked everywhere. This page is not in the studio.</p>
+    <a href="/">Back to the studio</a>
+  </main>
+  <script>
+    var eye = document.querySelector(".eye"), pupil = eye.querySelector("i");
+    addEventListener("pointermove", function (e) {
+      var r = eye.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      var d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 300);
+      pupil.style.setProperty("--x", (dx / d) * k * r.width * 0.22 + "px");
+      pupil.style.setProperty("--y", (dy / d) * k * r.height * 0.24 + "px");
+    });
+  </script>
+</body>
+</html>

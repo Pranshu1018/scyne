@@ -21,7 +21,9 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&amp;family=Geist+Mono:wght@400..600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&amp;family=Geist+Mono:wght@400..600&amp;display=swap" /></noscript>
   <script>
-    document.documentElement.classList.add("js");
+    document.documentElement.classList.add("js", "is-loading");
+    // if the page's script never runs, the preloader must not trap the visitor
+    setTimeout(function () { if (!window.__scyneBoot) { document.documentElement.classList.remove("is-loading"); var p = document.querySelector(".pre"); if (p) p.remove(); } }, 12000);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("rm");
   </script>
   <script type="application/ld+json">
@@ -38,9 +40,18 @@
 <body>
   <a class="skip" href="#read">Skip the 3D tour</a>
 
-  <div class="loader" aria-hidden="true">
-    <span class="loader__t">Opening the 3D studio</span><span class="loader__count">0%</span>
-    <span class="loader__line"><i></i></span>
+  <!-- Preloader: covers the page until the 3D studio has really loaded, then parts like a curtain -->
+  <div class="pre" role="status" aria-label="Loading the studio">
+    <div class="pre__half pre__half--t" aria-hidden="true"></div>
+    <div class="pre__half pre__half--b" aria-hidden="true"></div>
+    <div class="pre__in">
+      <div class="pre__fx" aria-hidden="true"><div class="pre__glow"></div><div class="pre__floor"><i></i></div></div>
+      <p class="pre__brand" aria-hidden="true">Scyne <span>Studio tour</span></p>
+      <p class="pre__phrase" aria-hidden="true"><span>Unlocking the door</span></p>
+      <p class="pre__count" aria-hidden="true"><b>000</b><small>%</small></p>
+      <div class="pre__bar" aria-hidden="true"><i></i></div>
+      <button class="pre__skip" type="button" hidden>Slow connection? Enter now <span aria-hidden="true">→</span></button>
+    </div>
   </div>
 
   <!-- A photo of the studio paints at once; the live 3D studio fades in over it when ready -->
@@ -232,7 +243,7 @@
         </div>
       </section>
 
-      <!-- Work: six example projects. Desktop: a fly-through, each project floating in depth over a
+      <!-- Work: six live projects. Desktop: a fly-through, each project floating in depth over a
            glowing grid; scrolling travels through them. Elsewhere: a plain list of cards. -->
       <section class="block block--deck" id="work" aria-labelledby="work-title">
         <div class="deck">
@@ -243,148 +254,99 @@
           <div class="deck__stage" aria-hidden="false">
             <div class="corridor" aria-hidden="true"></div>
             <ol class="deck__cards">
-              <li class="dcard" style="--c:#3ad6b4" data-i="0" data-for="For a dental clinic group, Pune" data-placeholder>
-                <button class="dcard__hit" type="button" aria-label="Open the Brightsmile Dental project"></button>
-                <div class="dcard__art case__art">
-                  <div class="ui-phone">
-                    <p class="ui-phone__brand">Brightsmile</p>
-                    <p class="ui-phone__h">Book a check-up in three taps.</p>
-                    <div class="ui-slots"><i>9:30</i><i class="is-on">11:00</i><i>14:15</i><i>16:40</i></div>
-                    <p class="ui-phone__btn">Book 11:00 →</p>
-                  </div>
-                  <span class="case__stamp">+212%<small>online bookings</small></span>
-                </div>
+              <li class="dcard" style="--c:#d4a47d" data-i="0" data-for="Interior design and renovation · Navi Mumbai" data-url="https://ayushinteriors.in">
+                <button class="dcard__hit" type="button" aria-label="Open the Ayush Interiors project"></button>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/ayush-interiors.png" alt="Ayush Interiors homepage hero"></div>
                 <div class="dcard__meta">
-                  <h3 class="dcard__name">Brightsmile Dental</h3>
-                  <p class="dcard__what">Website, online booking, Google Ads</p>
-                  <span class="dcard__year">2026</span>
+                  <h3 class="dcard__name">Ayush Interiors</h3>
+                  <p class="dcard__what">Interior design &amp; renovation</p>
+                  <span class="dcard__year">LIVE</span>
                 </div>
                 <div class="dcard__story" hidden>
                   <dl>
-                    <div><dt>The problem</dt><dd>Patients rang all day to book, and half the calls came while the front desk was with someone.</dd></div>
-                    <div><dt>What we did</dt><dd>A fast site that answers the usual questions, online booking tied to the clinic calendar, reminders on WhatsApp, and Google Ads for “dentist near me” in three neighbourhoods.</dd></div>
-                    <div><dt>What happened</dt><dd>Online bookings up 212% in four months; missed appointments down by a third.</dd></div>
+                    <div><dt>Project</dt><dd>Ayush Interiors</dd></div>
+                    <div><dt>Focus</dt><dd>Residential interior design, modular kitchens, wardrobes and renovation in Navi Mumbai.</dd></div>
+                    <div><dt>Live website</dt><dd>Explore the Ayush Interiors website and its completed spaces.</dd></div>
                   </dl>
                 </div>
               </li>
-              <li class="dcard" style="--c:#ffb547" data-i="1" data-for="For a neighbourhood café, Bengaluru" data-placeholder>
-                <button class="dcard__hit" type="button" aria-label="Open the Café Lumen project"></button>
-                <div class="dcard__art case__art">
-                  <p class="art-word">Lumen</p>
-                  <div class="ui-ticket">
-                    <p><b>Order #2041</b><span>ready 08:12</span></p>
-                    <p>Flat white<span>×2</span></p>
-                    <p>Almond croissant<span>×1</span></p>
-                    <p class="ui-ticket__paid">Paid · picked up</p>
-                  </div>
-                  <span class="case__stamp">3.1×<small>return on ad spend</small></span>
-                </div>
+              <li class="dcard" style="--c:#d4c6ff" data-i="1" data-for="Digital studio · Websites, AI and tools" data-url="https://lucid-tau-orpin.vercel.app/">
+                <button class="dcard__hit" type="button" aria-label="Open the LUCID project"></button>
+                <div class="dcard__art case__art"><img class="dcard__photo dcard__photo--wide" src="/projects/lucid.png" alt="LUCID digital studio homepage hero"></div>
                 <div class="dcard__meta">
-                  <h3 class="dcard__name">Café Lumen</h3>
-                  <p class="dcard__what">Ordering site, Instagram ads</p>
-                  <span class="dcard__year">2026</span>
+                  <h3 class="dcard__name">LUCID</h3>
+                  <p class="dcard__what">Websites, AI &amp; digital systems</p>
+                  <span class="dcard__year">LIVE</span>
                 </div>
                 <div class="dcard__story" hidden>
                   <dl>
-                    <div><dt>The problem</dt><dd>A busy café with long morning queues and an Instagram that looked great but sold nothing.</dd></div>
-                    <div><dt>What we did</dt><dd>Order-ahead pages that work in two taps, and Instagram ads that show the morning menu to people within 2 km, only before 10 am.</dd></div>
-                    <div><dt>What happened</dt><dd>3.1× return on ad spend; one in five morning orders now placed ahead.</dd></div>
+                    <div><dt>Project</dt><dd>LUCID — a digital studio</dd></div>
+                    <div><dt>Focus</dt><dd>Websites, AI automations, tools and complete digital systems.</dd></div>
+                    <div><dt>Live website</dt><dd>Explore the LUCID digital studio.</dd></div>
                   </dl>
                 </div>
               </li>
-              <li class="dcard" style="--c:#9ad46b" data-i="2" data-for="For a residential developer, Mumbai" data-placeholder>
-                <button class="dcard__hit" type="button" aria-label="Open the Oakfield Homes project"></button>
-                <div class="dcard__art case__art">
-                  <div class="ui-browser">
-                    <p class="ui-browser__bar"><i></i><i></i><i></i><span>oakfieldhomes.in/visit</span></p>
-                    <div class="ui-browser__body">
-                      <p class="ui-browser__h">2 &amp; 3-bed homes, 6 minutes from the metro.</p>
-                      <p class="ui-browser__p">Show flat open this Saturday.</p>
-                      <p class="ui-browser__btn">Book a visit</p>
-                    </div>
-                  </div>
-                  <span class="case__stamp">640<small>qualified leads in 90 days</small></span>
-                </div>
+              <li class="dcard" style="--c:#74d7aa" data-i="2" data-for="AI systems for answering, qualifying and following up" data-url="https://everline-ai.vercel.app/">
+                <button class="dcard__hit" type="button" aria-label="Open the Everline AI project"></button>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/everline-ai.png" alt="Everline AI homepage hero"></div>
                 <div class="dcard__meta">
-                  <h3 class="dcard__name">Oakfield Homes</h3>
-                  <p class="dcard__what">Landing pages, Meta lead ads, CRM automation</p>
-                  <span class="dcard__year">2025</span>
+                  <h3 class="dcard__name">Everline AI</h3>
+                  <p class="dcard__what">AI receptionists &amp; workflow automation</p>
+                  <span class="dcard__year">LIVE</span>
                 </div>
                 <div class="dcard__story" hidden>
                   <dl>
-                    <div><dt>The problem</dt><dd>Leads from portals arrived late, in five inboxes, and most were never called back.</dd></div>
-                    <div><dt>What we did</dt><dd>One landing page per project, Meta lead ads, and an automation that saves every lead to the CRM and sends a WhatsApp reply within a minute.</dd></div>
-                    <div><dt>What happened</dt><dd>640 qualified leads in 90 days, every one answered in under a minute.</dd></div>
+                    <div><dt>Project</dt><dd>Everline AI</dd></div>
+                    <div><dt>Focus</dt><dd>AI receptionists, chatbots, workflow automation and websites.</dd></div>
+                    <div><dt>Live website</dt><dd>See the AI systems offered by Everline.</dd></div>
                   </dl>
                 </div>
               </li>
-              <li class="dcard" style="--c:#ff8fb1" data-i="3" data-for="For an independent skincare brand" data-placeholder>
-                <button class="dcard__hit" type="button" aria-label="Open the Nimbus Skincare project"></button>
-                <div class="dcard__art case__art">
-                  <div class="ui-shop">
-                    <div><i></i><p>Cloud serum</p><b>₹1,450</b></div>
-                    <div><i></i><p>Dew cream</p><b>₹990</b></div>
-                    <div><i></i><p>Night oil</p><b>₹1,200</b></div>
-                  </div>
-                  <span class="case__stamp">+86%<small>conversion rate</small></span>
-                </div>
+              <li class="dcard" style="--c:#fa6543" data-i="3" data-for="Indian kitchen and Italian oven" data-url="https://spice-slice.vercel.app/">
+                <button class="dcard__hit" type="button" aria-label="Open the Spice &amp; Slice project"></button>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/spice-slice.png" alt="Spice &amp; Slice homepage hero"></div>
                 <div class="dcard__meta">
-                  <h3 class="dcard__name">Nimbus Skincare</h3>
-                  <p class="dcard__what">Online store, product ads, email flows</p>
-                  <span class="dcard__year">2025</span>
+                  <h3 class="dcard__name">Spice &amp; Slice</h3>
+                  <p class="dcard__what">Restaurant · Indian &amp; Italian</p>
+                  <span class="dcard__year">LIVE</span>
                 </div>
                 <div class="dcard__story" hidden>
                   <dl>
-                    <div><dt>The problem</dt><dd>A loved skincare line selling through DMs, with no store and no idea which ads worked.</dd></div>
-                    <div><dt>What we did</dt><dd>An online store with fast product pages, abandoned-cart emails, and product ads tracked to the sale.</dd></div>
-                    <div><dt>What happened</dt><dd>Conversion rate up 86%; repeat orders up 40% from email alone.</dd></div>
+                    <div><dt>Project</dt><dd>Spice &amp; Slice</dd></div>
+                    <div><dt>Focus</dt><dd>A restaurant bringing together Indian kitchen favourites and Italian oven dishes.</dd></div>
+                    <div><dt>Live website</dt><dd>View the Spice &amp; Slice menu and restaurant site.</dd></div>
                   </dl>
                 </div>
               </li>
-              <li class="dcard" style="--c:#6ea8ff" data-i="4" data-for="For a regional logistics company" data-placeholder>
-                <button class="dcard__hit" type="button" aria-label="Open the Northline Logistics project"></button>
-                <div class="dcard__art case__art">
-                  <div class="ui-dash">
-                    <p class="ui-dash__k">Deliveries this week <span>auto-updated 06:00</span></p>
-                    <div class="ui-bars"><i style="--h:.42"></i><i style="--h:.58"></i><i style="--h:.51"></i><i style="--h:.73"></i><i style="--h:.66"></i><i style="--h:.88"></i><i style="--h:.95"></i></div>
-                    <p class="ui-dash__row"><span>On time</span><b>97.4%</b></p>
-                  </div>
-                  <span class="case__stamp">22 h<small>saved every week</small></span>
-                </div>
+              <li class="dcard" style="--c:#ff7c6b" data-i="4" data-for="Read manhwa, manga and webtoons online" data-url="https://gogomanhwa.vercel.app/">
+                <button class="dcard__hit" type="button" aria-label="Open the GoGoManhwa project"></button>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/gogomanhwa.png" alt="GoGoManhwa homepage hero"></div>
                 <div class="dcard__meta">
-                  <h3 class="dcard__name">Northline Logistics</h3>
-                  <p class="dcard__what">Internal tools, reporting automation</p>
-                  <span class="dcard__year">2024</span>
+                  <h3 class="dcard__name">GoGoManhwa</h3>
+                  <p class="dcard__what">Manhwa, manga &amp; webtoon reader</p>
+                  <span class="dcard__year">LIVE</span>
                 </div>
                 <div class="dcard__story" hidden>
                   <dl>
-                    <div><dt>The problem</dt><dd>Every Monday, two people spent the day building the weekly delivery report by hand.</dd></div>
-                    <div><dt>What we did</dt><dd>Internal tools that pull from the dispatch system and a report that updates itself at 6 am.</dd></div>
-                    <div><dt>What happened</dt><dd>22 hours of manual work saved every week; on-time rate visible to all.</dd></div>
+                    <div><dt>Project</dt><dd>GoGoManhwa</dd></div>
+                    <div><dt>Focus</dt><dd>An online reading platform for manhwa, manga and webtoons.</dd></div>
+                    <div><dt>Live website</dt><dd>Browse the available series on GoGoManhwa.</dd></div>
                   </dl>
                 </div>
               </li>
-              <li class="dcard" style="--c:#ff6a3d" data-i="5" data-for="For a boutique fitness studio" data-placeholder>
-                <button class="dcard__hit" type="button" aria-label="Open the Studio Nine Fitness project"></button>
-                <div class="dcard__art case__art">
-                  <div class="ui-chat">
-                    <p class="ui-chat__in">Any spin classes left tonight?</p>
-                    <p class="ui-chat__out">Two spots at 7:30 pm with Ana. Want one?</p>
-                    <p class="ui-chat__in">Yes please!</p>
-                    <p class="ui-chat__out">Booked ✓ See you at 7:30.</p>
-                  </div>
-                  <span class="case__stamp">1,900<small>chats answered a month</small></span>
-                </div>
+              <li class="dcard" style="--c:#a97852" data-i="5" data-for="Leather atelier · wholesale and retail · Dharavi, Mumbai" data-url="https://hiclassleather.vercel.app/">
+                <button class="dcard__hit" type="button" aria-label="Open the Hiclass Leather project"></button>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/hiclass-leather.png" alt="Hiclass Leather homepage hero"></div>
                 <div class="dcard__meta">
-                  <h3 class="dcard__name">Studio Nine Fitness</h3>
-                  <p class="dcard__what">WhatsApp assistant, class booking</p>
-                  <span class="dcard__year">2024</span>
+                  <h3 class="dcard__name">Hiclass Leather</h3>
+                  <p class="dcard__what">Leather atelier · wholesale &amp; retail</p>
+                  <span class="dcard__year">LIVE</span>
                 </div>
                 <div class="dcard__story" hidden>
                   <dl>
-                    <div><dt>The problem</dt><dd>The front desk answered the same class and price questions hundreds of times a week.</dd></div>
-                    <div><dt>What we did</dt><dd>A WhatsApp assistant that knows the timetable and prices, books classes, and hands anything unusual to a person.</dd></div>
-                    <div><dt>What happened</dt><dd>1,900 chats answered a month; class fill rate up 18%.</dd></div>
+                    <div><dt>Project</dt><dd>Hiclass Leather</dd></div>
+                    <div><dt>Focus</dt><dd>Leather jackets, bags, wallets, belts and boots, wholesale and retail in Dharavi, Mumbai.</dd></div>
+                    <div><dt>Live website</dt><dd>Explore the Hiclass Leather collection.</dd></div>
                   </dl>
                 </div>
               </li>
@@ -392,8 +354,8 @@
           </div>
           <div class="deck__hud">
             <p class="deck__count"><b>01</b> / 06</p>
-            <p class="deck__name">Brightsmile Dental</p>
-            <p class="deck__meta"><i></i><span>Website, online booking, Google Ads · 2026</span></p>
+            <p class="deck__name">Ayush Interiors</p>
+            <p class="deck__meta"><i></i><span>Interior design &amp; renovation · LIVE</span></p>
             <p class="deck__hint">Scroll to walk the corridor · click a project to open it</p>
           </div>
           <div class="corridor__pill" aria-hidden="true"><i></i><span></span></div>
@@ -405,18 +367,18 @@
             <p class="corridor__p"></p>
             <dl class="corridor__spec"></dl>
             <div class="corridor__foot">
-              <button class="corridor__view" type="button">Read the case study <span aria-hidden="true">→</span></button>
+              <a class="corridor__view" href="https://ayushinteriors.in" target="_blank" rel="noopener noreferrer">Visit live site <span aria-hidden="true">↗</span></a>
               <button class="corridor__next" type="button"><small>Next project</small><span></span></button>
             </div>
           </aside>
           <nav class="deck__ticks" aria-label="Projects">
             <ol>
-              <li><button type="button" data-i="0"><span>Brightsmile Dental</span></button></li>
-              <li><button type="button" data-i="1"><span>Café Lumen</span></button></li>
-              <li><button type="button" data-i="2"><span>Oakfield Homes</span></button></li>
-              <li><button type="button" data-i="3"><span>Nimbus Skincare</span></button></li>
-              <li><button type="button" data-i="4"><span>Northline Logistics</span></button></li>
-              <li><button type="button" data-i="5"><span>Studio Nine Fitness</span></button></li>
+              <li><button type="button" data-i="0"><span>Ayush Interiors</span></button></li>
+              <li><button type="button" data-i="1"><span>LUCID</span></button></li>
+              <li><button type="button" data-i="2"><span>Everline AI</span></button></li>
+              <li><button type="button" data-i="3"><span>Spice &amp; Slice</span></button></li>
+              <li><button type="button" data-i="4"><span>GoGoManhwa</span></button></li>
+              <li><button type="button" data-i="5"><span>Hiclass Leather</span></button></li>
             </ol>
           </nav>
         </div>
@@ -430,11 +392,27 @@
           <h2 class="caseview__title" id="caseview-title"></h2>
           <div class="caseview__art"></div>
           <div class="caseview__story"></div>
-          <a class="btn btn--red caseview__cta" href="#contact">Start a project like this</a>
+          <a class="btn btn--red caseview__cta" href="https://ayushinteriors.in" target="_blank" rel="noopener noreferrer">Visit live project ↗</a>
         </div>
       </div>
 
       <!-- Numbers -->
+      <!-- Reel: the projects' screenshots, one wiping over the last (built by extras.js) -->
+      <section class="block reel" aria-label="Showreel" hidden>
+        <div class="wrap">
+          <header class="reel__head">
+            <p class="kicker"><b>●</b> Showreel</p>
+            <p class="reel__count">01 / 06</p>
+          </header>
+          <div class="reel__frame"></div>
+          <div class="reel__foot">
+            <div><p class="reel__name"></p><p class="reel__what"></p></div>
+            <button class="reel__next" type="button">Next <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="reel__bar" aria-hidden="true"><i></i></div>
+        </div>
+      </section>
+
       <section class="block block--stats" aria-label="In numbers">
         <div class="wrap">
           <ul class="stats" data-placeholder>
@@ -442,6 +420,18 @@
             <li><b data-count="3.4" data-decimals="1" data-suffix="×">3.4<small>×</small></b><span>average return on ad spend</span></li>
             <li><b data-count="11" data-suffix=" s">11<small>s</small></b><span>average assistant reply</span></li>
             <li><b data-count="100" data-suffix="%">100<small>%</small></b><span>of accounts in your name</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="block block--about" id="about" aria-labelledby="about-title">
+        <div class="wrap about">
+          <p class="kicker" id="about-title"><b>✺</b> About</p>
+          <p class="about__say">We are a small studio that builds the whole chain: the site people land on, the automation behind it, the assistant that answers at midnight and the ads that bring people in. One team, so nothing falls between agencies.</p>
+          <ul class="about__facts" data-placeholder>
+            <li><b>2023</b><span>Started</span></li>
+            <li><b>Mumbai</b><span>Based in, working remotely</span></li>
+            <li><b>Same day</b><span>Replies to every message</span></li>
           </ul>
         </div>
       </section>
@@ -499,6 +489,7 @@
       </section>
 
       <section class="block block--contact" id="contact" aria-labelledby="contact-title">
+        <canvas class="dots" aria-hidden="true"></canvas>
         <div class="wrap contact">
           <div class="contact__copy">
             <p class="kicker"><b>06</b> Contact</p>
@@ -537,6 +528,7 @@
             <a href="mailto:hello@scyne.studio">hello@scyne.studio</a>
             <a href="https://www.linkedin.com/" rel="noopener" data-placeholder>LinkedIn</a>
             <a href="https://www.instagram.com/" rel="noopener" data-placeholder>Instagram</a>
+            <a href="#about">About</a>
             <a href="#stop-intro">Back to the studio ↑</a>
           </div>
         </div>
@@ -544,6 +536,7 @@
     </div>
   </main>
 
+  <p class="egg" role="status" aria-live="polite"></p>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

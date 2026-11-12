@@ -17,15 +17,15 @@ function adScreen(i) {
   return (ctx, t, w, h) => {
     const ad = ADS[i], loop = t % 9;
     ctx.fillStyle = i === 1 ? "#d9d4cb" : "#ece8df"; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#121212"; ctx.font = `500 22px ${MONO}`; ctx.textBaseline = "middle"; ctx.fillText(ad.tag.toUpperCase(), 40, 46);
-    ctx.font = `600 50px ${FONT}`;
+    ctx.fillStyle = "#121212"; ctx.font = `600 26px ${MONO}`; ctx.textBaseline = "middle"; ctx.fillText(ad.tag.toUpperCase(), 40, 46);
+    ctx.font = `600 56px ${FONT}`;
     let line = "", y = 140;
     for (const wd of ad.line.split(" ")) { const tt = line ? `${line} ${wd}` : wd; if (ctx.measureText(tt).width > w - 90) { ctx.fillText(line, 40, y); line = wd; y += 58; } else line = tt; }
     ctx.fillText(line, 40, y);
     if (loop > 3 + i * 1.2) {
       ctx.globalAlpha = ease((loop - 3 - i * 1.2) / 0.4);
       rr(ctx, 40, h - 100, 190, 60, 30); ctx.fillStyle = ad.keep ? "#121212" : "#ff3d1f"; ctx.fill();
-      ctx.fillStyle = ad.keep ? "#ece8df" : "#121212"; ctx.font = `600 26px ${FONT}`; ctx.fillText(ad.keep ? "✓ Keep" : "✕ Stop", 70, h - 70);
+      ctx.fillStyle = ad.keep ? "#ece8df" : "#121212"; ctx.font = `600 28px ${FONT}`; ctx.fillText(ad.keep ? "✓ Keep" : "✕ Stop", 70, h - 70);
       ctx.globalAlpha = 1;
     }
   };
@@ -35,7 +35,7 @@ function chart(kind) {
   return (ctx, t, w, h) => {
     const grow = ease((t % 9) / 4);
     ctx.fillStyle = "#101113"; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = kind === "enq" ? "#ece8df" : "#ff3d1f"; ctx.font = `600 34px ${FONT}`; ctx.textBaseline = "middle";
+    ctx.fillStyle = kind === "enq" ? "#ece8df" : "#ff3d1f"; ctx.font = `600 40px ${FONT}`; ctx.textBaseline = "middle";
     ctx.fillText(kind === "enq" ? "Enquiries per week" : "Cost per customer", 40, 50);
     const x0 = 40, y0 = 95, cw = w - 80, ch = h - 160, bw = cw / 8;
     if (kind === "enq") {
@@ -48,17 +48,17 @@ function chart(kind) {
       CPC.slice(0, Math.max(1, Math.ceil(grow * 8))).forEach((v, i) => { const x = x0 + i * bw + bw / 2, y = y0 + (1 - v / 100) * ch; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
       ctx.stroke();
     }
-    ctx.fillStyle = "#6b6b72"; ctx.font = `500 18px ${MONO}`;
+    ctx.fillStyle = "#9a989f"; ctx.font = `500 22px ${MONO}`;
     for (let i = 0; i < 8; i++) ctx.fillText(`W${i + 1}`, x0 + i * bw + bw / 2 - 14, h - 32);
   };
 }
 
 function decision(ctx, t, w, h) {
   ctx.fillStyle = "#101113"; ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = "#8d8b93"; ctx.font = `500 22px ${MONO}`; ctx.textBaseline = "middle"; ctx.fillText("THIS WEEK", 40, 50);
+  ctx.fillStyle = "#a7a5ac"; ctx.font = `500 26px ${MONO}`; ctx.textBaseline = "middle"; ctx.fillText("THIS WEEK", 40, 50);
   [["Ads tested", "3"], ["Kept", "A, C"], ["Stopped", "B"], ["Cost per customer", "−54% since week 1"]].forEach(([k, v], i) => {
-    ctx.fillStyle = "#ece8df"; ctx.font = `500 29px ${FONT}`; ctx.fillText(k, 40, 118 + i * 62);
-    ctx.fillStyle = i === 3 ? "#ff3d1f" : "#ece8df"; ctx.font = `600 29px ${FONT}`;
+    ctx.fillStyle = "#ece8df"; ctx.font = `500 33px ${FONT}`; ctx.fillText(k, 40, 118 + i * 62);
+    ctx.fillStyle = i === 3 ? "#ff3d1f" : "#ece8df"; ctx.font = `600 33px ${FONT}`;
     ctx.fillText(v, w - 40 - ctx.measureText(v).width, 118 + i * 62);
     ctx.fillStyle = "rgba(255,255,255,.07)"; ctx.fillRect(40, 146 + i * 62, w - 80, 2);
   });
@@ -67,7 +67,7 @@ function decision(ctx, t, w, h) {
 const TICKER = "TESTING 3 ADS  ·  KEEP A AND C  ·  STOP B  ·  ENQUIRIES UP 3.7× IN 8 WEEKS  ·  COST PER CUSTOMER DOWN 54%  ·  ";
 function drawTicker(ctx, t, w, h) {
   ctx.fillStyle = "#0b0b0d"; ctx.fillRect(0, 0, w, h);
-  ctx.font = `500 40px ${MONO}`; ctx.textBaseline = "middle";
+  ctx.font = `500 44px ${MONO}`; ctx.textBaseline = "middle";
   const tw = ctx.measureText(TICKER).width, x = -((t * 120) % tw);
   ctx.fillStyle = "#ff3d1f";
   for (let k = 0; k < 3; k++) ctx.fillText(TICKER, x + k * tw, h / 2 + 2);

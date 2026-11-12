@@ -27,8 +27,10 @@ export const POSE = {
   },
   // each wrist relative to the head joint, in torso lengths (pelvis to head, seated): either side
   // of the back of his neck
-  wrist: { L: [0.1243, 0.0177, -0.1252], R: [-0.1136, 0.0252, -0.1475] },
-  elbow: { L: [0.7387, 0.6648, 0.1108], R: [-0.7387, 0.6648, 0.1108] }, // which way the elbows point: out, up
+  wrist: { L: [0.1243, -0.01, -0.13], R: [-0.1136, -0.004, -0.15] },
+  // which way the elbows point: out, a little up and forward, resting rather than pushed wide
+  elbow: { L: [0.74, 0.46, 0.42], R: [-0.74, 0.46, 0.42] },
+  headTilt: 0.12, // radians the head rests back, chin up a little: leaning back, content
   fingers: { L: [-0.9578, -0.2873, 0], R: [0.9578, -0.2873, 0] }, // across, towards the other hand
   palm: [0, 0, 1], // the palms face forward, onto his neck
   curl: [0.4, 0.5, 0.4], // radians at the three finger joints, knuckle to tip
@@ -40,6 +42,7 @@ const RIGS = {
   rocketbox: {
     pelvis: "Bip01_Pelvis", spine: ["Bip01_Spine", "Bip01_Spine1", "Bip01_Spine2"], neck: ["Bip01_Neck"], head: "Bip01_Head",
     breathe: ["Bip01_Spine1", "Bip01_Spine2"],
+    eyes: ["Bip01_LEye", "Bip01_REye"], lids: ["Bip01_LEyeBlinkTop", "Bip01_REyeBlinkTop"],
     side: (s) => ({
       upper: `Bip01_${s}_UpperArm`, fore: `Bip01_${s}_Forearm`, hand: `Bip01_${s}_Hand`,
       thigh: `Bip01_${s}_Thigh`, calf: `Bip01_${s}_Calf`, foot: `Bip01_${s}_Foot`, toe: `Bip01_${s}_Toe0`,
@@ -57,6 +60,16 @@ const RIGS = {
         fingers: ["index", "middle", "ring", "pinky"].map((f) => [1, 2, 3].map((k) => `${f}_0${k}_${x}`)),
       };
     },
+  },
+  simpleman: {
+    pelvis: "bacino", spine: ["addome", "schiena"], neck: ["collo"], head: "testa",
+    breathe: ["schiena"],
+    side: (s) => ({
+      upper: `bicipite_${s}`, fore: `avambraccio_${s}`, hand: `mano_${s}`,
+      thigh: `gamba_${s}`, calf: `polpaccio_${s}`, foot: `piede_${s}`, toe: `avampiede_${s}`,
+      // The supplied mesh has one rigid hand bone per side, with no individual finger joints.
+      fingers: [],
+    }),
   },
 };
 
@@ -83,16 +96,27 @@ function bendChain(chain, end, dir) {
   });
 }
 
+/* A skeleton whose "_L" bones are on its right (naming conventions differ): swap the sides */
+const mirrored = (rig) => ({ ...rig, side: (s) => rig.side(s === "L" ? "R" : "L") });
+
+/* Sit a standing model down. Returns the rig with its sides as the man's own left and right. */
 function sit(man, rig, frame) {
   const bone = (n) => man.getObjectByName(n);
-  const L = rig.side("L"), R = rig.side("R");
+  let L = rig.side("L"), R = rig.side("R");
   // A model that came seated (the first avatar: its pose is in the file) is left as it is. One that
   // arrives standing, thighs straight down (a MetaHuman in its rest pose), is sat down: first
-  // turned to face the desk, his left along +x and up along +y.
+  // turned to face the desk (+z), up along +y.
   const down = wp(bone(L.calf)).sub(wp(bone(L.thigh))).normalize().dot(frame.dir([0, -1, 0]));
-  if (down < 0.8) return;
-  const left = wp(bone(L.upper)).sub(wp(bone(R.upper))).normalize();
+  if (down < 0.8) return rig;
   const up = wp(bone(rig.head)).sub(wp(bone(rig.pelvis))).normalize();
+  // which way he faces comes from his feet (toes point forward), not from bone names, which
+  // some rigs mirror; without toe bones, from the shoulders
+  let left;
+  if (bone(L.toe) && bone(R.toe)) {
+    const fwd = wp(bone(L.toe)).sub(wp(bone(L.foot))).add(wp(bone(R.toe)).sub(wp(bone(R.foot))));
+    fwd.addScaledVector(up, -fwd.dot(up)).normalize();
+    left = new THREE.Vector3().crossVectors(up, fwd).normalize(); // up × forward = his left
+  } else left = wp(bone(L.upper)).sub(wp(bone(R.upper))).normalize();
   const wantLeft = frame.dir([1, 0, 0]), wantUp = frame.dir([0, 1, 0]);
   {
     const q = new THREE.Quaternion().setFromUnitVectors(up, wantUp);
@@ -103,6 +127,8 @@ function sit(man, rig, frame) {
     man.quaternion.premultiply(q2.clone().invert().multiply(q).multiply(q2));
     man.updateMatrixWorld(true);
   }
+  // now facing the desk: if the "_L" arm is on his right, the names are mirrored
+  if (wp(bone(L.upper)).sub(wp(bone(R.upper))).dot(wantLeft) < 0) { rig = mirrored(rig); L = rig.side("L"); R = rig.side("R"); }
   const P = POSE.sit;
   bendChain(rig.spine.map(bone), bone(rig.neck[0]), frame.dir(P.spine));
   bendChain(rig.neck.map(bone), bone(rig.head), frame.dir(P.neck));
@@ -118,6 +144,7 @@ function sit(man, rig, frame) {
     man.position.add(man.parent.worldToLocal(wp(man).add(shift)).sub(man.position));
     man.updateMatrixWorld(true);
   }
+  return rig;
 }
 
 function poseArms(man, rig, frame, P) {
@@ -127,8 +154,8 @@ function poseArms(man, rig, frame, P) {
   for (const s of ["L", "R"]) {
     const n = rig.side(s), sx = s === "L" ? 1 : -1;
     const b = (k) => bone(n[k]);
-    const finger = n.fingers.map((joints) => joints.map(bone));
-    if (!b("hand") || !finger[1][1]) continue;
+    const finger = (n.fingers || []).map((joints) => joints.map(bone));
+    if (!b("hand")) continue;
     const fingerDir = () => wp(finger[1][1]).sub(wp(finger[1][0])).normalize();
     // the palm side: index-to-little across the knuckles, crossed with the fingers' direction,
     // mirrored between the hands
@@ -143,6 +170,10 @@ function poseArms(man, rig, frame, P) {
     const cosA = (a * a + d * d - c * c) / (2 * a * d), sinA = Math.sqrt(Math.max(0, 1 - cosA * cosA));
     aimDir(b("upper"), b("fore"), S.clone().addScaledVector(u, a * cosA).addScaledVector(v, a * sinA).sub(S));
     aimDir(b("fore"), b("hand"), H.clone().sub(wp(b("fore"))));
+
+    // Some compact character rigs have a single rigid hand mesh without finger joints.
+    // The arm still reaches behind the head; leave that hand in its neutral wrist pose.
+    if (!finger[1]?.[1]) continue;
 
     // hand: fingers and palm the way POSE says
     turnWorld(b("hand"), q1.setFromUnitVectors(fingerDir(), frame.dir(P.fingers[s])));
@@ -202,7 +233,7 @@ function fixHair(hair) {
 }
 
 /* Pose the man. Call once he is in the group he sits in (its space is the chair's space).
-   Returns the bones that breathe ({ spine: [two bones], neck, head }), or null for a skeleton
+   Returns the bones that move afterwards ({ spine: [two bones], neck, head, eyes, lids }), or null for a skeleton
    this does not know. */
 export function prepareMan(man) {
   let top = man;
@@ -222,7 +253,13 @@ export function prepareMan(man) {
     dir: (d) => new THREE.Vector3(...d).transformDirection(chair.matrixWorld),
     point: (p) => new THREE.Vector3(...p).applyMatrix4(chair.matrixWorld),
   };
-  const pose = (P = POSE) => { sit(man, rig, frame); poseArms(man, rig, frame, P); };
+  const pose = (P = POSE) => {
+    const own = sit(man, rig, frame);
+    // the head rests back first (about his left-right axis), so the hands find the neck where it ends up
+    const head = man.getObjectByName(own.head);
+    if (head && P.headTilt) turnWorld(head, q1.setFromAxisAngle(frame.dir([1, 0, 0]), -P.headTilt));
+    poseArms(man, own, frame, P);
+  };
   if (import.meta.env.DEV) {
     // dev: man.userData.repose({ ...POSE, wrist: … }) tries other numbers on the live scene
     const exported = new Map(skin.skeleton.bones.map((b) => [b, b.quaternion.clone()]));
@@ -236,5 +273,5 @@ export function prepareMan(man) {
   pose();
   if (hair && rig === RIGS.rocketbox) fixHair(hair);
   const bone = (n) => man.getObjectByName(n);
-  return { spine: rig.breathe.map(bone), neck: bone(rig.neck[0]), head: bone(rig.head) };
+  return { spine: rig.breathe.map(bone), neck: bone(rig.neck[0]), head: bone(rig.head), eyes: (rig.eyes || []).map(bone).filter(Boolean), lids: (rig.lids || []).map(bone).filter(Boolean) };
 }
