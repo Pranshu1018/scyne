@@ -27,7 +27,7 @@ function inlineCss() {
 /* Asset versions (see src/asset-url.js): a short hash of every file in each public folder the
    studio loads from. Changing one model gives every model URL a new version, so browsers fetch
    the new files instead of showing the previous studio from their cache. */
-const VERSIONED = ["models", "textures", "bake", "env", "posters"];
+const VERSIONED = ["models", "textures", "bake", "env", "posters", "projects"];
 function folderHash(dir) {
   const h = createHash("sha1");
   const walk = (d) => {
@@ -47,13 +47,35 @@ function versionHtmlAssets() {
   return {
     name: "version-html-assets",
     transformIndexHtml(html) {
-      return html.replace(/\/(posters)\/[^\s"'?]+/g, (url, folder) => (assetVersions[folder] ? `${url}?v=${assetVersions[folder]}` : url));
+      return html.replace(/\/(posters|projects)\/[^\s"'?]+/g, (url, folder) => (assetVersions[folder] ? `${url}?v=${assetVersions[folder]}` : url));
+    },
+  };
+}
+
+/* The 3D studio is loaded with a dynamic import, which the browser only discovers once the page's
+   script runs; then the models only once the studio's code has arrived. Naming the studio's
+   chunks in the HTML lets the browser fetch them alongside the page script instead. */
+function preloadStudio() {
+  return {
+    name: "preload-studio",
+    apply: "build",
+    enforce: "post",
+    transformIndexHtml: {
+      order: "post",
+      handler(html, ctx) {
+        const chunks = Object.values(ctx.bundle || {}).filter((c) => c.type === "chunk");
+        const studio = chunks.find((c) => c.facadeModuleId && /world[\\/]studio\.js$/.test(c.facadeModuleId));
+        if (!studio) return html;
+        const files = [studio.fileName, ...studio.imports];
+        const tags = files.map((f) => `<link rel="modulepreload" crossorigin href="/${f}">`).join("\n  ");
+        return html.replace("</head>", `  ${tags}\n</head>`);
+      },
     },
   };
 }
 
 export default defineConfig({
-  plugins: [inlineCss(), versionHtmlAssets()],
+  plugins: [inlineCss(), versionHtmlAssets(), preloadStudio()],
   define: { __ASSET_V__: JSON.stringify(assetVersions) },
   server: { port: 5177, host: true },
   build: { outDir: "dist", emptyOutDir: true, chunkSizeWarningLimit: 1100 },

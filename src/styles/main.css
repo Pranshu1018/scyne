@@ -59,37 +59,66 @@ html:not(.in-tour) .shade, html:not(.in-tour) .tags { opacity: 0; pointer-events
 .world-on .posters { opacity: 0; }
 
 /* ---------- Preloader ----------
-   Shown at once (it is only HTML and CSS). The counter follows the real download and build of
-   the studio (main.js). When everything is in, the content fades, the two halves part like a
-   curtain, the scene eases back from a slight zoom, and only then the hero text comes in.
+   Shown at once (it is only HTML and CSS). The name spins in like a slot machine, one letter
+   locking in each time the studio gets a fifth further (main.js follows the real download and
+   build); the counter rolls like an odometer; the services flash behind in hard cuts. When it is
+   all in, you fly in: the name rushes past, the red floor drops away, the dark lifts onto the 3D;
+   and only then the hero text comes in.
    Everything that moves here is transform or opacity, so it stays smooth while the page is busy. */
 .pre { display: none; }
 .js .pre { display: block; position: fixed; inset: 0; z-index: 500; }
-.pre__half { position: absolute; left: 0; right: 0; height: 50.2%; background: var(--bg); transition: transform 1.15s var(--ease-io) .35s; }
-.pre__half--t { top: 0; border-bottom: 1px solid var(--red); }
-.pre__half--b { bottom: 0; border-top: 1px solid var(--red); }
-.pre__in { position: absolute; inset: 0; overflow: hidden; transition: opacity .4s; }
-.pre__fx { position: absolute; inset: 0; }
-.pre__glow { position: absolute; left: 50%; top: 50%; width: 70vmax; height: 70vmax; margin: -35vmax 0 0 -35vmax; background: radial-gradient(circle, rgba(255, 61, 31, .34) 0, rgba(255, 61, 31, .08) 30%, transparent 55%); animation: preGlow 3.2s ease-in-out infinite; }
-.pre__floor { position: absolute; left: -50%; right: -50%; top: 50%; height: 100vh; transform: perspective(520px) rotateX(76deg); transform-origin: 50% 0; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 55%, transparent 92%); mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 55%, transparent 92%); }
-.pre__floor i { position: absolute; inset: -96px 0 0; background-image: linear-gradient(rgba(255, 61, 31, .5) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(255, 61, 31, .4) 1.5px, transparent 1.5px); background-size: 96px 96px; animation: preFloor 1.1s linear infinite; }
-@keyframes preFloor { to { transform: translateY(96px); } }
+.pre__bg { position: absolute; inset: 0; background: var(--bg); transition: opacity .75s var(--ease) .35s; }
+.pre__in { position: absolute; inset: 0; overflow: hidden; }
+.pre__glow { will-change: transform, opacity; position: absolute; left: 50%; top: 46%; width: 80vmax; height: 80vmax; margin: -40vmax 0 0 -40vmax; background: radial-gradient(circle, rgba(255, 61, 31, .26) 0, rgba(255, 61, 31, .06) 30%, transparent 55%); }
 @keyframes preGlow { 50% { transform: scale(1.18); opacity: .7; } }
+/* the red floor: a grid in perspective, gliding towards you. The grid is one layer moved only by a
+   transform (no mask over it, which made the browser repaint it every frame); a still gradient
+   on top fades it out at the horizon and the bottom edge */
+.pre__floor { position: absolute; left: 0; right: 0; top: 50%; bottom: 0; overflow: hidden; transform-origin: 50% 0; transition: transform 1.1s cubic-bezier(.55, 0, .2, 1), opacity .7s .3s; }
+.pre__floor i { position: absolute; left: -25%; right: -25%; top: 0; height: 115vh; transform-origin: 50% 0; will-change: transform; background-image: linear-gradient(rgba(255, 61, 31, .55) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(255, 61, 31, .45) 1.5px, transparent 1.5px); background-size: 96px 96px; animation: preFloor .9s linear infinite; }
+.pre__floor::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, var(--bg) 0, rgba(7, 7, 10, .55) 14%, transparent 38%, transparent 72%, var(--bg) 100%); }
+@keyframes preFloor { from { transform: perspective(600px) rotateX(76deg) translateY(-96px); } to { transform: perspective(600px) rotateX(76deg) translateY(0); } }
+/* the horizon: a hot line where the floor meets the dark */
+.pre__floor::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; z-index: 1; background: linear-gradient(90deg, transparent, var(--red) 25%, #ffb199 50%, var(--red) 75%, transparent); box-shadow: 0 0 30px 4px rgba(255, 61, 31, .55); }
+/* what we do, flashing behind in hard cuts: solid, dim letters (an outline would trace the
+   font's overlapping shapes) */
+.pre__flash { position: absolute; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(-62%); text-align: center; white-space: nowrap; font-family: var(--f-display); font-weight: 700; font-size: clamp(90px, 19vw, 340px); line-height: 1; letter-spacing: -.06em; color: #0f0f13; }
+.pre__flash span { display: inline-block; animation: preFlash .42s var(--ease) both; }
+@keyframes preFlash { from { transform: scale(1.18); opacity: 0; } }
+/* a red line scanning down the screen */
+.pre__scan { position: absolute; left: 0; right: 0; top: 0; height: 22vh; background: linear-gradient(to bottom, transparent, rgba(255, 61, 31, .07) 85%, rgba(255, 61, 31, .55) 99.5%, transparent); display: none; }
+@keyframes preScan { from { transform: translateY(-22vh); } to { transform: translateY(100vh); } }
 .pre__brand { position: absolute; left: var(--gutter); top: calc(22px + env(safe-area-inset-top, 0px)); font-family: var(--f-display); font-weight: 700; font-size: 21px; letter-spacing: -.01em; }
 .pre__brand span { margin-left: 14px; font-family: var(--f-mono); font-weight: 400; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
-.pre__phrase { position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(50% + 22px); overflow: hidden; font-family: var(--f-display); font-weight: 600; font-size: clamp(30px, 5.4vw, 92px); line-height: 1.02; letter-spacing: -.04em; }
-.pre__phrase span { display: block; animation: preUp .7s var(--ease) both; }
+/* the name, in five reels: each strip spins (only a transform: no repaint) until its letter lands */
+.pre__word { position: absolute; left: 0; right: 0; bottom: calc(50% + 6px); margin: 0; display: flex; justify-content: center; gap: .02em; font-family: var(--f-display); font-weight: 700; font-size: clamp(84px, 17vw, 300px); line-height: 1; letter-spacing: -.05em; }
+.slot { display: block; height: 1em; overflow: hidden; }
+.slot__s { display: block; text-align: center; will-change: transform; animation: reelSpin .32s linear infinite; animation-delay: calc(var(--i) * -.07s); color: #3a3a40; }
+.slot__s b { display: block; height: 1em; font-weight: inherit; }
+@keyframes reelSpin { to { transform: translateY(-50%); } }
+.slot.is-set .slot__s { animation: reelLand .75s cubic-bezier(.18, 1.45, .4, 1) both; color: var(--ink); transition: color .3s; }
+.slot.is-set:last-child .slot__s { color: var(--red); }
+@keyframes reelLand { from { transform: translateY(-40%); } to { transform: translateY(0); } }
+.pre__phrase { position: absolute; left: 0; right: 0; top: calc(50% + 22px); z-index: 2; margin: 0; overflow: hidden; text-align: center; font-family: var(--f-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.pre__phrase span { display: block; animation: preUp .5s var(--ease) both; }
 @keyframes preUp { from { transform: translateY(110%); } }
-.pre__count { position: absolute; left: var(--gutter); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: baseline; font-family: var(--f-display); font-weight: 700; font-size: clamp(110px, 24vw, 380px); line-height: .8; letter-spacing: -.06em; font-variant-numeric: tabular-nums; color: var(--ink); }
-.pre__count small { font-size: .22em; letter-spacing: 0; color: var(--red); margin-left: .12em; }
-.pre__bar { position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1px; }
+/* the counter: three digit wheels rolling like an odometer */
+.pre__count { position: absolute; left: var(--gutter); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); margin: 0; display: flex; align-items: flex-end; font-family: var(--f-display); font-weight: 700; font-size: clamp(64px, 11vw, 170px); line-height: 1; letter-spacing: -.05em; font-variant-numeric: tabular-nums; color: var(--ink); transition: transform .7s var(--ease-io) .05s, opacity .4s; }
+.odo { display: block; height: 1em; overflow: hidden; }
+.odo__s { display: block; text-align: center; transform: translateY(calc(var(--n, 0) * -10%)); transition: transform .45s cubic-bezier(.3, 1.3, .5, 1); will-change: transform; }
+.pre__count small { align-self: flex-start; margin: .1em 0 0 .12em; font-size: .24em; letter-spacing: 0; color: var(--red); }
+.pre__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; }
 .pre__bar i { display: block; height: 100%; background: var(--red); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); box-shadow: 0 0 24px var(--red); }
 .pre__skip { position: absolute; right: var(--gutter); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); padding: 12px 18px; border-radius: 99px; border: 1px solid var(--line); background: var(--bg-2); font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .pre__skip:hover { border-color: var(--red); color: var(--red); }
+/* the exit: you fly in. The name rushes past (each letter growing and fading, from the middle
+   out), the floor drops away beneath, the dark lifts, and the studio eases in from its zoom */
 .pre.is-done { pointer-events: none; }
-.pre.is-done .pre__in { opacity: 0; }
-.pre.is-done .pre__half--t { transform: translateY(-101%); }
-.pre.is-done .pre__half--b { transform: translateY(101%); }
+.pre.is-done .slot { transform: scale(3.4); opacity: 0; transition: transform .9s cubic-bezier(.6, 0, .3, 1) calc(var(--o) * 50ms), opacity .55s calc(var(--o) * 50ms + .25s); }
+.pre.is-done .pre__floor { transform: translateY(18vh) scaleX(1.6); opacity: 0; }
+.pre.is-done .pre__count, .pre.is-done .pre__brand, .pre.is-done .pre__phrase, .pre.is-done .pre__skip, .pre.is-done .pre__bar, .pre.is-done .pre__flash, .pre.is-done .pre__scan { opacity: 0; transition: opacity .3s; }
+.pre.is-done .pre__glow { animation: none; transform: scale(2.2); opacity: 0; transition: transform 1s var(--ease), opacity .8s .2s; }
+.pre.is-done .pre__bg { opacity: 0; }
 /* the page behind it: held still and slightly zoomed, hero and chrome waiting */
 .js.is-loading, .js.is-loading body { overflow: hidden; }
 .world, .posters { transform-origin: 50% 55%; }
@@ -97,9 +126,8 @@ html:not(.in-tour) .shade, html:not(.in-tour) .tags { opacity: 0; pointer-events
 .js.is-loading .cap { opacity: 0 !important; transform: translateY(40px) !important; }
 .js.is-loading .nav, .js.is-loading .progress, .js.is-loading .tags { opacity: 0; }
 .nav { transition: opacity .8s var(--ease) .3s; }
-.rm .pre__half { transition: opacity .3s; }
-.rm .pre.is-done .pre__half { transform: none; opacity: 0; }
-.rm .pre__floor i, .rm .pre__glow, .rm .pre__phrase span { animation: none; }
+.rm .pre.is-done .slot, .rm .pre.is-done .pre__floor { transform: none; }
+.rm .pre__glow, .rm .pre__floor i, .rm .pre__phrase span, .rm .pre__scan, .rm .slot__s, .rm .pre__flash span { animation: none !important; }
 @media (max-width: 720px) { .pre__skip { left: var(--gutter); right: auto; bottom: auto; top: calc(64px + env(safe-area-inset-top, 0px)); } }
 
 /* ---------- Nav ---------- */
@@ -191,6 +219,23 @@ html:not(.in-tour) .progress { opacity: 0; }
 .form__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .form__status { font-size: 14px; color: var(--mute); }
 .form__status.is-err { color: var(--red); }
+.form__status.is-ok { color: var(--ink); }
+.form__status a { color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+.form__status b { color: #3ddc84; font-weight: 600; }
+.form__hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.field em { font-style: normal; color: var(--mute); }
+.btn:disabled { opacity: .6; cursor: progress; }
+/* WhatsApp: a button in the contact section, and a small one that floats on every screen */
+.wa-btn { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: center; justify-self: start; margin-top: 22px; padding: 14px 22px 14px 16px; border-radius: 18px; background: #25d366; color: #062b15; transition: transform .4s var(--ease), background .3s; }
+.wa-btn svg { grid-row: span 2; width: 34px; height: 34px; }
+.wa-btn span { font-weight: 700; font-size: 17px; line-height: 1.2; }
+.wa-btn small { font-family: var(--f-mono); font-size: 11px; letter-spacing: .02em; opacity: .75; }
+.wa-btn:hover { transform: translateY(-3px); background: #2fe476; }
+.wa-float { position: fixed; right: calc(18px + env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 90; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px 0 14px; border-radius: 99px; background: #25d366; color: #062b15; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); transition: transform .4s var(--ease), opacity .6s var(--ease) .6s; }
+.wa-float svg { width: 24px; height: 24px; }
+.wa-float:hover { transform: translateY(-3px) scale(1.03); }
+.js.is-loading .wa-float { opacity: 0; transform: translateY(20px); pointer-events: none; }
+@media (max-width: 720px) { .wa-float { height: 52px; width: 52px; padding: 0; justify-content: center; } .wa-float span { display: none; } }
 @media (max-width: 900px) { .contact { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 520px) { .form__row { grid-template-columns: minmax(0, 1fr); } }
 

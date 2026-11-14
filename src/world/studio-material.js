@@ -145,6 +145,9 @@ void main() {
    colour of the same three camera stops with and without the bake (?nobake). */
 export const lightMapIntensity = { value: 2.4 };
 export const lightMapSaturation = { value: 0.7 };
+/* Surface detail (normal maps, the soft highlight): off on integrated graphics and phones, where it
+   would halve the frame rate; studio.js sets it before the bake is applied */
+export const shading = { detail: true };
 
 /* Turn a surface's existing material (for its colour, texture, roughness, metalness, cut-outs)
    into a studio material lit by one lightmap atlas, or (probe, a linear colour) by one baked
@@ -158,7 +161,7 @@ export function studioMaterial(src, lightMap, scale, env, probe = null) {
   if (arm) arm.updateMatrix();
   // with a map the factor is only an upper bound, so judge glossiness by the map being there
   const reflective = !!env && (rough < 0.75 || metal > 0.3 || !!arm);
-  const nmap = src.normalMap || null;
+  const nmap = (shading.detail && src.normalMap) || null;
   if (nmap) nmap.updateMatrix();
   const glow = src.emissive && src.emissiveIntensity > 0 && src.emissive.getHex() !== 0 ? src.emissive.clone().multiplyScalar(src.emissiveIntensity) : null;
   const m = new THREE.ShaderMaterial({
@@ -200,7 +203,7 @@ export function studioMaterial(src, lightMap, scale, env, probe = null) {
   if (src.alphaTest > 0) m.defines.USE_ALPHATEST = "";
   if (reflective) m.defines.USE_REFLECTION = "";
   if (nmap) m.defines.USE_NORMALMAP = "";
-  if (!probe && (rough < 0.9 || !!arm)) m.defines.USE_SHEEN = "";
+  if (shading.detail && !probe && (rough < 0.9 || !!arm)) m.defines.USE_SHEEN = "";
   if (probe) m.defines.USE_PROBE = "";
   if (rmap) m.defines.USE_ROUGHNESSMAP = "";
   if (mmap) m.defines.USE_METALNESSMAP = "";

@@ -16,6 +16,7 @@ import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLigh
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { captureCube, loadRoomEnv, bakeRoomEnv } from "./envmap.js";
 import { loadBake, applyBake } from "./bake.js";
+import { shading } from "./studio-material.js";
 
 import { loadAssets } from "./assets.js";
 import { Screen } from "./kit.js";
@@ -159,7 +160,7 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   composer.addPass(new RenderPass(scene, camera));
   const gtao = small ? null : new GTAOPass(scene, camera, 512, 512);
   if (gtao) { gtao.blendIntensity = 0.9; gtao.updateGtaoMaterial({ radius: 0.45, distanceExponent: 1.5, thickness: 1.2, scale: 1 }); gtao.enabled = TIERS[tier].ao; composer.addPass(gtao); }
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), small ? 0.16 : TIERS[tier].bloom, 0.5, 0.92);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), small ? 0.16 : TIERS[tier].bloom, 0.5, 1.0);
   composer.addPass(bloom);
   const output = new OutputPass(); composer.addPass(output);
   const finish = addFinish(output);
@@ -207,7 +208,10 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
   const wantBake = !new URLSearchParams(location.search).has("nobake");
   const bakeLoad = wantBake ? loadBake(renderer).catch((e) => { console.warn("[scyne] lighting bake failed to load", e); return null; }) : Promise.resolve(null);
   // with the bake, the room's normal maps are not needed (see loadAssets)
-  loadAssets(renderer, onProgress, { normals: !wantBake || !small }).then(async (A) => {
+  // surface detail (normal maps in the studio shader) costs too much on integrated graphics and phones:
+  // there the bake alone carries the look, and they skip downloading the maps
+  const detail = !small && !weak;
+  loadAssets(renderer, onProgress, { normals: !wantBake || detail }).then(async (A) => {
     mark("assets loaded"); performance.mark("scyne:assets");
     const pmrem = new THREE.PMREMGenerator(renderer);
     // Light everything with the room's baked reflections. Without the file, a neutral studio light
@@ -264,13 +268,18 @@ export function createStudio(canvas, { reduce, still, onProgress, onReady, onHov
     // few moving parts (the man, the chair, the phone).
     const bake = await bakeLoad;
     t1 = performance.now();
+    shading.detail = detail;
+    // props replaced by better live-lit ones stay in the scene until the bake has matched it
+    const retired = [];
+    scene.traverse((o) => { if (o.isMesh && o.material && !Array.isArray(o.material) && o.material.userData.retire) retired.push(o); });
     if (bake && baked && applyBake(scene, bake, { texture: baked.texture, intensity: ROOM_ENV, maxLod: Math.log2(baked.width) })) {
       bakedLighting = true;
       scene.traverse((o) => { if (o.isLight && !o.userData.live) o.visible = false; if (o.isLight) o.castShadow = false; });
       renderer.shadowMap.enabled = false;
       if (gtao) gtao.enabled = false; // ambient occlusion is in the bake
       step("lighting bake applied");
-    } else if (wantBake && small) A.loadNormals(); // live lighting after all: it wants the normal detail
+    } else if (wantBake && !detail) A.loadNormals(); // live lighting after all: it wants the normal detail
+    retired.forEach((o) => { o.visible = false; });
     if (bake) { bake.geometries.clear(); if (!bakedLighting) bake.lightmaps.forEach((t) => t.dispose()); }
 
     freezeStatic(scene);

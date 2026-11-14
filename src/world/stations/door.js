@@ -33,17 +33,32 @@ export function buildDoor(A) {
   const handle = box(0.02, 0.3, 0.03, mats.blackSteel); handle.position.set(-W + 0.08, 1.05, 0.04);
   hinge.add(leaf, handle); hinge.rotation.y = 1.15;
   g.add(hinge);
-  // neon script above: drawn once (the glow blur is costly), the flicker is just the material fading
-  const sign = new Screen(1024, 256, 1.3, 0.325, (ctx, t, w, h) => {
+  // neon script above: drawn once (the glow blur is costly), the flicker is just the material fading.
+  // Filled letters only, never outlined: the font's letters are built from overlapping shapes and an
+  // outline would trace every overlap. A soft halo, the red glass, then a white-hot core that is
+  // brightest down the middle of each stroke (a blurred copy of the letters, masked to them).
+  const sign = new Screen(2048, 512, 1.3, 0.325, (ctx, t, w, h) => {
     ctx.clearRect(0, 0, w, h);
-    ctx.font = `italic 600 150px ${FONT}`; ctx.textBaseline = "middle"; ctx.textAlign = "center";
-    ctx.shadowColor = "rgba(255,70,40,.9)"; ctx.shadowBlur = 26; ctx.fillStyle = "#ff5a3a";
-    ctx.fillText("Let's talk", w / 2, h / 2 + 6);
-    ctx.shadowBlur = 0; ctx.fillStyle = "#ff6040"; ctx.lineWidth = 3; ctx.strokeStyle = "#ff2a0e";
-    ctx.fillText("Let's talk", w / 2, h / 2 + 6); ctx.strokeText("Let's talk", w / 2, h / 2 + 6);
-  }, { brightness: 1.15, fps: 0, res: 0.75 });
+    const font = `italic 600 300px ${FONT}`, y = h / 2 + 10, word = "Let's talk";
+    ctx.font = font; ctx.textBaseline = "middle"; ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(255,40,15,1)"; ctx.shadowBlur = 30; ctx.fillStyle = "#ff2a10";
+    ctx.fillText(word, w / 2, y); // halo
+    ctx.shadowBlur = 0; ctx.fillStyle = "#ff3c1e";
+    ctx.fillText(word, w / 2, y); // the red glass
+    const core = document.createElement("canvas"); core.width = w; core.height = h;
+    const c = core.getContext("2d");
+    c.font = font; c.textBaseline = "middle"; c.textAlign = "center";
+    // the blur comes from a shadow cast back from far off-canvas: works in every browser
+    c.shadowColor = "#ffe6dc"; c.shadowBlur = 12; c.shadowOffsetX = w * 2; c.fillStyle = "#ffe6dc";
+    c.fillText(word, w / 2 - w * 2, y);
+    c.shadowColor = "transparent"; c.globalCompositeOperation = "destination-in"; c.fillStyle = "#000";
+    c.fillText(word, w / 2, y); // keep it inside the letters
+    ctx.globalAlpha = 0.85; ctx.drawImage(core, 0, 0); ctx.globalAlpha = 1;
+  }, { brightness: 1.6, fps: 0, res: 1 });
   sign.material.transparent = true;
-  sign.mesh.position.set(0, H + 0.5, 0.03);
+  // the light below it baked a shadow of the letters onto the wall about 3 cm higher: the sign sits
+  // over that shadow (seen from the tour), so the letters hide it
+  sign.mesh.position.set(0, H + 0.529, 0.03);
   g.add(sign.mesh);
 
   const spill = new THREE.PointLight("#ffc890", 4, 5, 1.8); spill.position.set(0, 1.4, 0.8); g.add(spill);

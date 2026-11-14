@@ -49,9 +49,11 @@ export class Screen {
     this.ctx = this.canvas.getContext("2d", { willReadFrequently: true });
     this.texture = new THREE.CanvasTexture(this.canvas);
     this.texture.colorSpace = THREE.SRGBColorSpace;
-    this.texture.anisotropy = 4;
-    this.texture.generateMipmaps = false; // re-uploaded often; skip rebuilding mipmaps each time
-    this.texture.minFilter = THREE.LinearFilter;
+    // mipmaps (rebuilt on the GPU at each upload, cheap) and anisotropic filtering keep the text
+    // crisp when a screen is far away or seen at an angle, instead of shimmering or smearing
+    this.texture.anisotropy = 16;
+    this.texture.generateMipmaps = true;
+    this.texture.minFilter = THREE.LinearMipmapLinearFilter;
     this.interval = fps > 0 ? 1 / fps : Infinity;
     this.draw = draw;
     this.material = new THREE.MeshBasicMaterial({ map: this.texture, toneMapped: false, color: new THREE.Color(1, 1, 1).multiplyScalar(brightness) });

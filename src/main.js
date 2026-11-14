@@ -96,9 +96,9 @@ const sound = initSound();
    when it is ready. With Data Saver, or without WebGL, it opens after a moment on the photos. */
 window.__scyneBoot = true;
 const pre = document.querySelector(".pre");
-const preCount = pre.querySelector(".pre__count b"), prePhrase = pre.querySelector(".pre__phrase"), preSkip = pre.querySelector(".pre__skip");
+const preOdo = [...pre.querySelectorAll(".odo")], preReels = [...pre.querySelectorAll(".slot")], preFlash = pre.querySelector(".pre__flash"), prePhrase = pre.querySelector(".pre__phrase"), preSkip = pre.querySelector(".pre__skip");
 const PHRASES = ["Unlocking the door", "Switching on the lights", "Booting the screens", "Waking the team", "Come on in"];
-const PRE_MIN = 1400; // ms the preloader stays at least, so a cached visit does not flicker
+const PRE_MIN = 1200; // ms the preloader stays at least, so a cached visit does not flicker
 let loadProgress = 0, worldReady = false, shown = 0, revealed = false, phrase = 0, giveUp = false;
 const preT0 = performance.now();
 lenis && lenis.stop();
@@ -107,22 +107,35 @@ function reveal() {
   revealed = true;
   pre.classList.add("is-done");
   // the hero and the nav come in as the curtain clears the middle of the screen
-  setTimeout(() => { root.classList.remove("is-loading"); lenis && lenis.start(); ScrollTrigger.refresh(); performance.mark("scyne:revealed"); }, reduce ? 150 : 950);
+  setTimeout(() => { root.classList.remove("is-loading"); lenis && lenis.start(); ScrollTrigger.refresh(); performance.mark("scyne:revealed"); dispatchEvent(new Event("scyne:studio-ready")); }, reduce ? 150 : 950);
   setTimeout(() => pre.remove(), 2000);
 }
 function preTick() {
   if (revealed) return;
   const goal = giveUp ? 100 : Math.min(100, loadProgress * 90 + (worldReady ? 10 : 0));
-  shown += Math.max(0.15, (goal - shown) * 0.09) * (goal > shown ? 1 : 0);
+  // eases towards the real progress by elapsed time, not per frame: a busy page draws few frames,
+  // and the counter must not lag behind a studio that is already ready (it finishes in ~0.4 s)
+  const now = performance.now(), dt = Math.min(0.25, (now - (preTick.last || now)) / 1000); preTick.last = now;
+  const rate = worldReady || giveUp ? 6 : 2.5;
+  shown += Math.max(dt * 8, (goal - shown) * (1 - Math.exp(-rate * dt)));
   shown = Math.min(shown, goal);
   const n = Math.round(shown);
-  preCount.textContent = String(n).padStart(3, "0");
+  // the odometer's three wheels, and a letter of the name locking in at every fifth of the way
+  String(n).padStart(3, "0").split("").forEach((d, i) => { if (preOdo[i].dataset.n !== d) { preOdo[i].dataset.n = d; preOdo[i].style.setProperty("--n", d); } });
+  preReels.forEach((r, i) => { if (!r.classList.contains("is-set") && (n >= (i + 1) * 19 || n >= 100)) r.classList.add("is-set"); });
   pre.style.setProperty("--p", (shown / 100).toFixed(3));
   const want = Math.min(PHRASES.length - 1, Math.floor((shown / 100) * PHRASES.length));
   if (want !== phrase) { phrase = want; const el = document.createElement("span"); el.textContent = PHRASES[want]; prePhrase.replaceChildren(el); }
   if (n >= 100 && (worldReady || giveUp) && performance.now() - preT0 > PRE_MIN) return reveal();
   requestAnimationFrame(preTick);
 }
+// what we do, flashing behind the name in hard cuts
+const FLASH = ["Websites", "Automation", "AI assistants", "Ads", "Leads"];
+let flashI = 0;
+const flashTimer = reduce ? 0 : setInterval(() => {
+  if (revealed) return clearInterval(flashTimer);
+  const el = document.createElement("span"); el.textContent = FLASH[flashI++ % FLASH.length]; preFlash.replaceChildren(el);
+}, 420);
 if (still) { // screenshots and tools: no preloader
   revealed = true; pre.remove(); root.classList.remove("is-loading"); lenis && lenis.start();
 } else requestAnimationFrame(preTick);
@@ -264,8 +277,10 @@ if (!reduce && "IntersectionObserver" in window) {
   document.querySelectorAll(".block__head, .svc, .case, .stats li, .quotes, .promises > div, .form, .reel__frame, .about__facts li").forEach((el) => { el.classList.add("rv"); io.observe(el); });
 }
 
+performance.mark("scyne:sections-start");
 initSections({ gsap, ScrollTrigger, lenis, reduce, drawer });
 initExtras({ gsap, ScrollTrigger, reduce });
+performance.measure("scyne:sections-init", "scyne:sections-start");
 initForm();
 document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());

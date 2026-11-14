@@ -156,8 +156,8 @@ export function initSections({ gsap, ScrollTrigger, lenis, reduce, drawer }) {
     if (finePointer) {
       // Geist is a variable font: each letter's weight eases towards 800 as the pointer comes near
       let px = -1e4, py = -1e4, live = false;
-      const weights = letters.map(() => 400);
-      letters.forEach((l) => l.style.setProperty("--wg", 400));
+      const weights = letters.map(() => 640);
+      letters.forEach((l) => l.style.setProperty("--wg", 640));
       title.closest("section").addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; live = true; });
       title.closest("section").addEventListener("pointerleave", () => { px = py = -1e4; });
       gsap.ticker.add(() => {
@@ -166,7 +166,7 @@ export function initSections({ gsap, ScrollTrigger, lenis, reduce, drawer }) {
         letters.forEach((l, i) => {
           const r = l.getBoundingClientRect();
           const d = Math.hypot(r.left + r.width / 2 - px, r.top + r.height / 2 - py);
-          const want = 400 + 500 * Math.exp(-(d * d) / (2 * 170 * 170));
+          const want = 640 + 260 * Math.exp(-(d * d) / (2 * 170 * 170));
           weights[i] += (want - weights[i]) * 0.15;
           if (Math.abs(want - weights[i]) > 0.5) moving = true;
           l.style.setProperty("--wg", weights[i].toFixed(0));
@@ -292,11 +292,23 @@ function initDeck({ gsap, ScrollTrigger, lenis, reduce, $, $$ }) {
     const io = new IntersectionObserver(([e]) => { inView = e.isIntersecting; }, { rootMargin: "20% 0px" });
     io.observe(deck);
 
-    import("./corridor.js").then(({ createCorridor }) => {
-      if (!alive) return;
-      corridor = createCorridor({ host: $(".corridor", section), cards, onHover, onOpen: (i) => (i === active ? openProject(i) : travelTo(i)) });
-      setActive(corridor.render(at, 0.016));
-    }).catch((err) => { console.error("[scyne] corridor failed", err); section.classList.remove("deck--live"); });
+    // built only when the visitor gets near it (or the browser is idle after the studio is up):
+    // its second WebGL context and its geometry stay out of the page's start-up
+    let building = false;
+    const build = () => {
+      if (building || !alive) return;
+      building = true; near.disconnect();
+      import("./corridor.js").then(({ createCorridor }) => {
+        if (!alive) return;
+        performance.mark("scyne:corridor-start");
+        corridor = createCorridor({ host: $(".corridor", section), cards, onHover, onOpen: (i) => (i === active ? openProject(i) : travelTo(i)) });
+        setActive(corridor.render(at, 0.016));
+        performance.measure("scyne:corridor-build", "scyne:corridor-start");
+      }).catch((err) => { console.error("[scyne] corridor failed", err); section.classList.remove("deck--live"); });
+    };
+    const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) build(); }, { rootMargin: "150% 0px" });
+    near.observe(section);
+    addEventListener("scyne:studio-ready", () => ("requestIdleCallback" in window ? requestIdleCallback(build, { timeout: 4000 }) : setTimeout(build, 2000)), { once: true });
 
     let last = performance.now();
     const tick = () => {
@@ -309,7 +321,7 @@ function initDeck({ gsap, ScrollTrigger, lenis, reduce, $, $$ }) {
     return () => {
       alive = false;
       gsap.ticker.remove(tick);
-      io.disconnect();
+      io.disconnect(); near.disconnect();
       closeProject();
       corridor && corridor.dispose();
       section.classList.remove("deck--live");

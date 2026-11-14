@@ -7,7 +7,7 @@
 
 import * as THREE from "three";
 import { mats, box, display, rr, FONT, MONO, ease } from "../kit.js";
-import { laptop, mug } from "../devices.js";
+import { laptop, mug, bakedMug, deskKeyboard, deskMouse, deskMat } from "../devices.js";
 
 // ---------- One timeline for all three screens ----------
 const LOOP = 20;
@@ -335,10 +335,18 @@ export function buildWeb(A) {
   monitorStand(g, 0.48, -0.08, 0.16, H);
   g.add(main.group, side.group);
 
+  // the first keyboard and mouse were plain boxes: kept for the lighting bake, hidden once it is applied
+  mats.matteWhite.userData.retire = true;
   const kb = box(0.42, 0.014, 0.13, mats.matteWhite, 0.005); kb.position.set(-0.18, H + 0.007, 0.16); g.add(kb);
   const mouse = box(0.06, 0.022, 0.1, mats.matteWhite, 0.011); mouse.position.set(0.18, H + 0.011, 0.18); g.add(mouse);
+  // a felt mat under the keyboard and mouse (it also covers the old props' baked shadows)
+  const MAT = 0.003;
+  const pad = deskMat(0.7, 0.3, MAT); pad.position.set(-0.05, H, 0.175); g.add(pad);
+  const keys = deskKeyboard(); keys.position.set(-0.18, H + MAT, 0.16); g.add(keys);
+  const mse = deskMouse(); mse.position.set(0.18, H + MAT, 0.18); mse.rotation.y = -0.08; g.add(mse);
   // the laptop running the builder, turned a little towards the chair
   const lap = laptop(drawBuilder, { fps: 15, scale: 1.15 }); lap.group.position.set(-0.6, H, 0.13); lap.group.rotation.y = 0.32; g.add(lap.group);
+  const cup0 = bakedMug(); cup0.position.set(0.36, H, 0.24); cup0.rotation.y = 0.8; g.add(cup0);
   const cup = mug(); cup.position.set(0.36, H, 0.24); cup.rotation.y = 0.8; g.add(cup);
 
   g.add(A.place("desk_lamp_arm_01", -0.74, H, -0.22, 25));

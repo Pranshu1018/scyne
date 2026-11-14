@@ -9,7 +9,7 @@ import * as THREE from "three";
 import { box, display, Screen, rr, FONT, MONO, ease } from "../kit.js";
 import { oakTable } from "./web.js";
 import { officeChair } from "../chair.js";
-import { laptop, plate, phone, mug, notebook } from "../devices.js";
+import { laptop, plate, phone, mug, bakedMug, notebook } from "../devices.js";
 import { prepareMan } from "../man.js";
 
 // ---------- Wall board: today's work, moving by itself ----------
@@ -160,7 +160,8 @@ export function buildAutomation(A) {
   const lap = laptop(drawLaptop, { fps: 6 }); lap.group.position.set(DX, H + 0.003, DZ - 0.1); lap.group.rotation.y = Math.PI + 0.12; g.add(lap.group);
   const ph = phone(drawPhone, { fps: 6, brightness: 0.8 }); ph.group.position.set(DX + 0.5, H, DZ - 0.12); ph.group.rotation.y = -0.35; g.add(ph.group);
   const phoneScreen = ph.screen;
-  const cup = mug(); cup.position.set(DX - 0.5, H, DZ - 0.18); cup.rotation.y = 2.2; g.add(cup);
+  const cup0 = bakedMug(); cup0.position.set(DX - 0.5, H, DZ - 0.18); cup0.rotation.y = 2.2; g.add(cup0);
+  const cup = mug(); cup.position.set(DX - 0.5, H + 0.0035, DZ - 0.18); cup.rotation.y = 2.2; g.add(cup);
   const book = notebook(hide); book.position.set(DX - 0.55, H, DZ + 0.1); book.rotation.y = 0.2; g.add(book);
   g.add(A.place("potted_plant_04", DX + 0.66, H, DZ + 0.22, 0, 1.1));
 

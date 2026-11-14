@@ -42,13 +42,16 @@
 
   <!-- Preloader: covers the page until the 3D studio has really loaded, then parts like a curtain -->
   <div class="pre" role="status" aria-label="Loading the studio">
-    <div class="pre__half pre__half--t" aria-hidden="true"></div>
-    <div class="pre__half pre__half--b" aria-hidden="true"></div>
+    <div class="pre__bg" aria-hidden="true"></div>
     <div class="pre__in">
-      <div class="pre__fx" aria-hidden="true"><div class="pre__glow"></div><div class="pre__floor"><i></i></div></div>
+      <div class="pre__glow" aria-hidden="true"></div>
+      <div class="pre__floor" aria-hidden="true"><i></i></div>
+      <p class="pre__flash" aria-hidden="true"></p>
+      <div class="pre__scan" aria-hidden="true"></div>
       <p class="pre__brand" aria-hidden="true">Scyne <span>Studio tour</span></p>
+      <p class="pre__word" aria-hidden="true"><span class="slot" style="--i:0;--o:2"><span class="slot__s"><b>S</b><b>X</b><b>K</b><b>2</b><b>D</b><b>E</b><b>&</b><b>G</b><b>0</b><b>D</b><b>S</b><b>X</b><b>K</b><b>2</b><b>D</b><b>E</b><b>&</b><b>G</b><b>0</b><b>D</b></span></span><span class="slot" style="--i:1;--o:1"><span class="slot__s"><b>C</b><b>9</b><b>P</b><b>C</b><b>F</b><b>4</b><b>3</b><b>E</b><b>S</b><b>F</b><b>C</b><b>9</b><b>P</b><b>C</b><b>F</b><b>4</b><b>3</b><b>E</b><b>S</b><b>F</b></span></span><span class="slot" style="--i:2;--o:0"><span class="slot__s"><b>Y</b><b>?</b><b>4</b><b>D</b><b>%</b><b>H</b><b>R</b><b>D</b><b>%</b><b>2</b><b>Y</b><b>?</b><b>4</b><b>D</b><b>%</b><b>H</b><b>R</b><b>D</b><b>%</b><b>2</b></span></span><span class="slot" style="--i:3;--o:1"><span class="slot__s"><b>N</b><b>D</b><b>R</b><b>C</b><b>?</b><b>J</b><b>V</b><b>3</b><b>K</b><b>&</b><b>N</b><b>D</b><b>R</b><b>C</b><b>?</b><b>J</b><b>V</b><b>3</b><b>K</b><b>&</b></span></span><span class="slot" style="--i:4;--o:2"><span class="slot__s"><b>E</b><b>H</b><b>%</b><b>W</b><b>?</b><b>M</b><b>G</b><b>%</b><b>N</b><b>0</b><b>E</b><b>H</b><b>%</b><b>W</b><b>?</b><b>M</b><b>G</b><b>%</b><b>N</b><b>0</b></span></span></p>
       <p class="pre__phrase" aria-hidden="true"><span>Unlocking the door</span></p>
-      <p class="pre__count" aria-hidden="true"><b>000</b><small>%</small></p>
+      <p class="pre__count" aria-hidden="true"><span class="odo" style="--i:0"><span class="odo__s">0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</span></span><span class="odo" style="--i:1"><span class="odo__s">0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</span></span><span class="odo" style="--i:2"><span class="odo__s">0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</span></span><small>%</small></p>
       <div class="pre__bar" aria-hidden="true"><i></i></div>
       <button class="pre__skip" type="button" hidden>Slow connection? Enter now <span aria-hidden="true">→</span></button>
     </div>
@@ -100,6 +103,8 @@
     <button type="button" class="drawer__close" aria-label="Close details">Close <span aria-hidden="true">✕</span></button>
     <div class="drawer__body"></div>
   </aside>
+
+  <a class="wa-float" href="https://wa.me/919372650767?text=Hi%20Scyne%2C%20I%27d%20like%20to%20talk%20about%20my%20business." target="_blank" rel="noopener" aria-label="Chat with Scyne on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.2a9.7 9.7 0 0 0-8.4 14.6L2.3 21.7l5-1.3A9.7 9.7 0 1 0 12 2.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.6 7.4c.3-.6.6-.6.9-.6h.6c.2 0 .4.1.5.4l.8 1.9c.1.2 0 .5-.1.7l-.6.7c-.1.2-.2.4 0 .6.4.7 1 1.4 1.6 1.9.7.6 1.4 1 2 1.2.2.1.4 0 .6-.1l.7-.9c.2-.2.4-.3.7-.2l1.8.9c.3.1.4.3.4.5 0 .6-.2 1.3-.7 1.7-.5.4-1.3.7-2.2.5-1.6-.4-3.1-1.2-4.3-2.4-1.2-1.1-2.2-2.6-2.6-4.1-.2-.9 0-1.8.7-2.6Z" fill="currentColor"/></svg><span>WhatsApp</span></a>
 
   <main>
     <!-- ================= THE TOUR ================= -->
@@ -256,7 +261,7 @@
             <ol class="deck__cards">
               <li class="dcard" style="--c:#d4a47d" data-i="0" data-for="Interior design and renovation · Navi Mumbai" data-url="https://ayushinteriors.in">
                 <button class="dcard__hit" type="button" aria-label="Open the Ayush Interiors project"></button>
-                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/ayush-interiors.png" alt="Ayush Interiors homepage hero"></div>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/ayush-interiors.webp" width="720" height="450" loading="lazy" decoding="async" alt="Ayush Interiors homepage hero"></div>
                 <div class="dcard__meta">
                   <h3 class="dcard__name">Ayush Interiors</h3>
                   <p class="dcard__what">Interior design &amp; renovation</p>
@@ -272,7 +277,7 @@
               </li>
               <li class="dcard" style="--c:#d4c6ff" data-i="1" data-for="Digital studio · Websites, AI and tools" data-url="https://lucid-tau-orpin.vercel.app/">
                 <button class="dcard__hit" type="button" aria-label="Open the LUCID project"></button>
-                <div class="dcard__art case__art"><img class="dcard__photo dcard__photo--wide" src="/projects/lucid.png" alt="LUCID digital studio homepage hero"></div>
+                <div class="dcard__art case__art"><img class="dcard__photo dcard__photo--wide" src="/projects/lucid.webp" width="720" height="450" loading="lazy" decoding="async" alt="LUCID digital studio homepage hero"></div>
                 <div class="dcard__meta">
                   <h3 class="dcard__name">LUCID</h3>
                   <p class="dcard__what">Websites, AI &amp; digital systems</p>
@@ -288,7 +293,7 @@
               </li>
               <li class="dcard" style="--c:#74d7aa" data-i="2" data-for="AI systems for answering, qualifying and following up" data-url="https://everline-ai.vercel.app/">
                 <button class="dcard__hit" type="button" aria-label="Open the Everline AI project"></button>
-                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/everline-ai.png" alt="Everline AI homepage hero"></div>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/everline-ai.webp" width="720" height="450" loading="lazy" decoding="async" alt="Everline AI homepage hero"></div>
                 <div class="dcard__meta">
                   <h3 class="dcard__name">Everline AI</h3>
                   <p class="dcard__what">AI receptionists &amp; workflow automation</p>
@@ -304,7 +309,7 @@
               </li>
               <li class="dcard" style="--c:#fa6543" data-i="3" data-for="Indian kitchen and Italian oven" data-url="https://spice-slice.vercel.app/">
                 <button class="dcard__hit" type="button" aria-label="Open the Spice &amp; Slice project"></button>
-                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/spice-slice.png" alt="Spice &amp; Slice homepage hero"></div>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/spice-slice.webp" width="720" height="450" loading="lazy" decoding="async" alt="Spice &amp; Slice homepage hero"></div>
                 <div class="dcard__meta">
                   <h3 class="dcard__name">Spice &amp; Slice</h3>
                   <p class="dcard__what">Restaurant · Indian &amp; Italian</p>
@@ -320,7 +325,7 @@
               </li>
               <li class="dcard" style="--c:#ff7c6b" data-i="4" data-for="Read manhwa, manga and webtoons online" data-url="https://gogomanhwa.vercel.app/">
                 <button class="dcard__hit" type="button" aria-label="Open the GoGoManhwa project"></button>
-                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/gogomanhwa.png" alt="GoGoManhwa homepage hero"></div>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/gogomanhwa.webp" width="720" height="450" loading="lazy" decoding="async" alt="GoGoManhwa homepage hero"></div>
                 <div class="dcard__meta">
                   <h3 class="dcard__name">GoGoManhwa</h3>
                   <p class="dcard__what">Manhwa, manga &amp; webtoon reader</p>
@@ -336,7 +341,7 @@
               </li>
               <li class="dcard" style="--c:#a97852" data-i="5" data-for="Leather atelier · wholesale and retail · Dharavi, Mumbai" data-url="https://hiclassleather.vercel.app/">
                 <button class="dcard__hit" type="button" aria-label="Open the Hiclass Leather project"></button>
-                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/hiclass-leather.png" alt="Hiclass Leather homepage hero"></div>
+                <div class="dcard__art case__art"><img class="dcard__photo" src="/projects/hiclass-leather.webp" width="720" height="450" loading="lazy" decoding="async" alt="Hiclass Leather homepage hero"></div>
                 <div class="dcard__meta">
                   <h3 class="dcard__name">Hiclass Leather</h3>
                   <p class="dcard__what">Leather atelier · wholesale &amp; retail</p>
@@ -496,12 +501,16 @@
             <h2 class="contact__title" id="contact-title" aria-label="Let's talk.">Let's talk.</h2>
             <p class="contact__p">Tell us what you need. We reply to every message ourselves, usually the same day.</p>
             <a class="contact__mail" href="mailto:hello@scyne.studio">hello@scyne.studio <span aria-hidden="true">↗</span></a>
+            <a class="wa-btn" href="https://wa.me/919372650767?text=Hi%20Scyne%2C%20I%27d%20like%20to%20talk%20about%20my%20business." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.2a9.7 9.7 0 0 0-8.4 14.6L2.3 21.7l5-1.3A9.7 9.7 0 1 0 12 2.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.6 7.4c.3-.6.6-.6.9-.6h.6c.2 0 .4.1.5.4l.8 1.9c.1.2 0 .5-.1.7l-.6.7c-.1.2-.2.4 0 .6.4.7 1 1.4 1.6 1.9.7.6 1.4 1 2 1.2.2.1.4 0 .6-.1l.7-.9c.2-.2.4-.3.7-.2l1.8.9c.3.1.4.3.4.5 0 .6-.2 1.3-.7 1.7-.5.4-1.3.7-2.2.5-1.6-.4-3.1-1.2-4.3-2.4-1.2-1.1-2.2-2.6-2.6-4.1-.2-.9 0-1.8.7-2.6Z" fill="currentColor"/></svg><span>Chat on WhatsApp</span><small>+91 93726 50767 · usually replies in minutes</small></a>
           </div>
-          <form class="form" id="contact-form" novalidate data-endpoint="">
+          <form class="form" id="contact-form" novalidate>
+            <!-- a field people never see: bots fill it in, and their messages are dropped -->
+            <input class="form__hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <div class="form__row">
               <label class="field"><span>Name</span><input id="f-name" name="name" type="text" autocomplete="name" required /></label>
               <label class="field"><span>Email</span><input id="f-email" name="email" type="email" autocomplete="email" required /></label>
             </div>
+            <label class="field"><span>Phone or WhatsApp <em>(optional)</em></span><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" /></label>
             <fieldset class="field">
               <legend>What do you need?</legend>
               <div class="picks">

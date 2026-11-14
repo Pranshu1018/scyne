@@ -22,7 +22,10 @@
 .marquee__track span { font-family: var(--f-display); font-weight: 700; font-size: clamp(42px, 7vw, 120px); line-height: 1; letter-spacing: -.04em; white-space: nowrap; padding-right: .3em; }
 .marquee { display: grid; gap: clamp(4px, .6vw, 10px); }
 .marquee__track--back { animation-direction: reverse; animation-duration: 34s; }
-.marquee__track--back span { color: transparent; -webkit-text-stroke: 1.5px #0a0a0c; }
+/* outlined text: the font's letters are built from overlapping shapes, and a plain outline traces
+   every overlap inside them. Stroke first, then fill in the background colour on top: only the
+   outer edge of each letter is left. */
+.marquee__track--back span { color: var(--red); -webkit-text-stroke: 3px #0a0a0c; paint-order: stroke fill; }
 .marquee__track i { font-style: normal; display: inline-block; margin: 0 .25em; animation: spin 6s linear infinite; }
 @keyframes marquee { to { translate: -50% 0; } }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -226,7 +229,7 @@
 /* ---------- Letter-by-letter titles, scrambled labels, weight that follows the pointer ---------- */
 .split .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
 .split .c { display: inline-block; will-change: transform; }
-.contact__title .ch { font-variation-settings: "wght" var(--wg, 800); }
+.contact__title .ch { font-variation-settings: "wght" var(--wg, 700); }
 
 /* ---------- Numbers ---------- */
 .block--stats { padding-block: clamp(60px, 8vw, 120px); }
@@ -303,7 +306,7 @@
 /* ---------- Footer: the name fills with red as you reach the bottom ---------- */
 .footer { padding: 40px 0 calc(80px + env(safe-area-inset-bottom, 0px)); overflow: hidden; border-top: 1px solid var(--line); }
 .footer__big { position: relative; width: max-content; max-width: 100%; font-family: var(--f-display); font-weight: 700; font-size: 27vw; line-height: .8; letter-spacing: -.045em; user-select: none; margin-left: -.04em; }
-.footer__big span:first-child { color: transparent; -webkit-text-stroke: 1px rgba(236, 232, 223, .2); }
+.footer__big span:first-child { color: var(--bg); -webkit-text-stroke: 2px rgba(236, 232, 223, .2); paint-order: stroke fill; }
 .footer__fill { position: absolute; inset: 0; color: var(--red); clip-path: inset(0 calc(100% - var(--p, 1) * 100%) 0 0); }
 .footer__row { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; padding-top: 24px; margin-top: 16px; border-top: 1px solid var(--line); font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
 .footer__row a:hover { color: var(--red); }

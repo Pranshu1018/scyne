@@ -13,7 +13,7 @@
       ]
     },
     {
-      "source": "/(models|textures|posters|bake|env)/(.*)",
+      "source": "/(models|textures|posters|bake|env|projects)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
